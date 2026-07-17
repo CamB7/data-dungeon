@@ -1,6 +1,8 @@
 import {
   integer,
+  jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -12,12 +14,17 @@ import {
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
-  displayName: text("display_name").notNull().unique(),
+  displayName: text("display_name").notNull(),
   image: text("image"),
-  /** XP toward the next SQL rank. */
+  /** Total XP earned from cleared chambers. */
   xp: integer("xp").notNull().default(0),
-  /** Highest chamber / quest floor cleared. */
+  /** Adventurer rank (1 + chambers cleared). */
   level: integer("level").notNull().default(1),
+  /** Skill miss counts for adaptive recommendations. */
+  weakSkills: jsonb("weak_skills")
+    .$type<Record<string, number>>()
+    .notNull()
+    .default({}),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -26,5 +33,23 @@ export const users = pgTable("users", {
     .notNull(),
 });
 
+export const chamberCompletions = pgTable(
+  "chamber_completions",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    chamberSlug: text("chamber_slug").notNull(),
+    xpAwarded: integer("xp_awarded").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.chamberSlug] }),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type ChamberCompletion = typeof chamberCompletions.$inferSelect;

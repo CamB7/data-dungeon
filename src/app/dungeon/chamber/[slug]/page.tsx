@@ -4,13 +4,11 @@ import { notFound } from "next/navigation";
 import {
   getAdjacentChambers,
   getChamberBySlug,
-  getChamberStatus,
   getChambers,
-  PREVIEW_CLEARED_CHAMBER,
 } from "@/content/chambers";
 import { SchemaPanel } from "@/components/dungeon/ChamberPanels";
 import { ChamberPlayground } from "@/components/dungeon/ChamberPlayground";
-import { ChamberStatusBanner } from "@/components/dungeon/ProgressBar";
+import { LiveChamberStatus } from "@/components/dungeon/LiveChamberStatus";
 import { DungeonShell } from "@/components/dungeon/DungeonShell";
 import { SkillTag } from "@/components/dungeon/SkillTag";
 
@@ -36,19 +34,22 @@ export default function ChamberPage({ params }: ChamberPageProps) {
   const chamber = getChamberBySlug(params.slug);
   if (!chamber) notFound();
 
-  const status = getChamberStatus(chamber.id, PREVIEW_CLEARED_CHAMBER);
   const { prev, next } = getAdjacentChambers(chamber.slug);
 
   return (
-    <DungeonShell>
+    <DungeonShell variant={chamber.isBoss ? "boss" : "default"}>
       <article>
         <header className="mb-8">
           <div className="flex flex-wrap items-center gap-3">
-            <p className="font-mono text-xs tracking-[0.25em] text-torch uppercase">
+            <p
+              className={`font-mono text-xs tracking-[0.25em] uppercase ${
+                chamber.isBoss ? "text-blood" : "text-torch"
+              }`}
+            >
               Chamber {String(chamber.id).padStart(2, "0")} · {chamber.floorName}
             </p>
             {chamber.isBoss ? (
-              <span className="rounded-full border border-torch bg-torch/10 px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-torch uppercase">
+              <span className="rounded-full border border-blood bg-blood/10 px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-blood uppercase animate-ember-flicker">
                 Boss
               </span>
             ) : null}
@@ -57,6 +58,12 @@ export default function ChamberPage({ params }: ChamberPageProps) {
             {chamber.title}
           </h1>
           <p className="mt-2 text-lg text-stone-400">{chamber.subtitle}</p>
+          {chamber.isBoss ? (
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-ash">
+              The air thins. Torchlight dies to embers. One wrong result set and the vault stays
+              sealed.
+            </p>
+          ) : null}
           <div className="mt-4 flex flex-wrap gap-2">
             {chamber.skills.map((skill) => (
               <SkillTag key={skill} skill={skill} />
@@ -68,7 +75,7 @@ export default function ChamberPage({ params }: ChamberPageProps) {
         </header>
 
         <div className="mb-8">
-          <ChamberStatusBanner status={status} />
+          <LiveChamberStatus chamberId={chamber.id} />
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr]">

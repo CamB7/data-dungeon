@@ -4,9 +4,6 @@ import type { Chamber, ChamberStatus } from "./types";
 export type { Chamber, ChamberStatus, ChamberTable, SqlSkill } from "./types";
 export { DUNGEON_TRACK, FLOOR_LABELS } from "./track";
 
-/** Highest chamber cleared (1–10). Mechanics will drive this from the DB later. */
-export const PREVIEW_CLEARED_CHAMBER = 1;
-
 export function getChambers(): Chamber[] {
   return DUNGEON_TRACK;
 }
@@ -19,13 +16,35 @@ export function getChamberById(id: number): Chamber | undefined {
   return DUNGEON_TRACK.find((chamber) => chamber.id === id);
 }
 
+/** Derive lock/current status from which chamber slugs the player has cleared. */
+export function getChamberStatusFromCleared(
+  chamberId: number,
+  clearedSlugs: string[],
+): ChamberStatus {
+  const clearedIds = new Set(
+    clearedSlugs
+      .map((slug) => DUNGEON_TRACK.find((c) => c.slug === slug)?.id)
+      .filter((id): id is number => typeof id === "number"),
+  );
+  const highestCleared = clearedIds.size
+    ? Math.max(...Array.from(clearedIds))
+    : 0;
+  const currentId = Math.min(highestCleared + 1, DUNGEON_TRACK.length);
+
+  if (clearedIds.has(chamberId)) return "cleared";
+  if (chamberId === currentId) return "current";
+  if (chamberId === currentId + 1) return "available";
+  return "locked";
+}
+
+/** @deprecated Prefer getChamberStatusFromCleared */
 export function getChamberStatus(
   chamberId: number,
-  clearedChamber: number = PREVIEW_CLEARED_CHAMBER,
+  currentChamberId: number = 1,
 ): ChamberStatus {
-  if (chamberId < clearedChamber) return "cleared";
-  if (chamberId === clearedChamber) return "current";
-  if (chamberId === clearedChamber + 1) return "available";
+  if (chamberId < currentChamberId) return "cleared";
+  if (chamberId === currentChamberId) return "current";
+  if (chamberId === currentChamberId + 1) return "available";
   return "locked";
 }
 

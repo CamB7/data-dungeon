@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Chamber } from "@/content/chambers";
-import {
-  loadProgress,
-  recordAttempt,
-  saveProgress,
-  type PlayerProgress,
-} from "@/lib/progress";
+import { usePlayerProgress } from "@/hooks/usePlayerProgress";
 import type { QueryResult } from "@/lib/sql/sandbox";
 import { WardenChat } from "@/components/dungeon/WardenChat";
 
@@ -39,14 +34,10 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
   const [outcome, setOutcome] = useState<RunResponse | null>(null);
   const [explain, setExplain] = useState<string | null>(null);
   const [explaining, setExplaining] = useState(false);
-  const [progress, setProgress] = useState<PlayerProgress | null>(null);
   const [askFail, setAskFail] = useState(false);
+  const { progress, recordLocalAndSync } = usePlayerProgress();
 
-  useEffect(() => {
-    setProgress(loadProgress());
-  }, []);
-
-  const cleared = progress?.cleared.includes(chamber.slug) ?? false;
+  const cleared = progress.cleared.includes(chamber.slug);
 
   const failContext = useMemo(() => {
     if (!outcome || outcome.passed || !outcome.result) return undefined;
@@ -98,14 +89,12 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
       setOutcome(data);
 
       if (data.ok && data.passed !== undefined) {
-        const next = recordAttempt(loadProgress(), {
+        await recordLocalAndSync({
           slug: chamber.slug,
           passed: Boolean(data.passed),
           skills: chamber.skills,
           xp: chamber.xp,
         });
-        saveProgress(next);
-        setProgress(next);
 
         if (data.passed) {
           void requestExplain("recap", data.result, sql);

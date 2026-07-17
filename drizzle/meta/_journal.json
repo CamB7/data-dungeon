@@ -8,6 +8,13 @@
       "when": 1783523468881,
       "tag": "0000_confused_phalanx",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784327000000,
+      "tag": "0002_chamber_completions",
+      "breakpoints": true
     }
   ]
 }

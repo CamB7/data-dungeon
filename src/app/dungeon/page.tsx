@@ -1,14 +1,10 @@
 import type { Metadata } from "next";
-import {
-  DUNGEON_TRACK,
-  getTotalTrackXp,
-  PREVIEW_CLEARED_CHAMBER,
-} from "@/content/chambers";
+import { DUNGEON_TRACK, getTotalTrackXp } from "@/content/chambers";
 import { AdaptiveRecommend } from "@/components/dungeon/AdaptiveRecommend";
 import { ChamberTrack } from "@/components/dungeon/ChamberTrack";
 import { DungeonShell } from "@/components/dungeon/DungeonShell";
-import { ProgressBar } from "@/components/dungeon/ProgressBar";
 import { QuestStart } from "@/components/dungeon/QuestStart";
+import { TrackProgressHeader } from "@/components/dungeon/TrackProgressHeader";
 import { WeeklyRaidCard } from "@/components/dungeon/WeeklyRaidCard";
 
 export const metadata: Metadata = {
@@ -34,13 +30,7 @@ export default function DungeonTrackPage() {
       </div>
 
       <div className="mb-10">
-        <ProgressBar
-          level={1}
-          xp={0}
-          xpToNext={100}
-          clearedChamber={PREVIEW_CLEARED_CHAMBER}
-          totalChambers={DUNGEON_TRACK.length}
-        />
+        <TrackProgressHeader />
       </div>
 
       <div className="mb-12 space-y-6">
@@ -54,7 +44,7 @@ export default function DungeonTrackPage() {
       <ChamberTrack />
 
       <p className="mt-16 text-center font-mono text-xs tracking-wide text-stone-500">
-        {DUNGEON_TRACK.length} chambers · {getTotalTrackXp()} XP on this track · progress saved locally
+        {DUNGEON_TRACK.length} chambers · {getTotalTrackXp()} XP on this track
       </p>
     </DungeonShell>
   );

@@ -1,15 +1,19 @@
+"use client";
+
 import {
   FLOOR_LABELS,
-  getChamberStatus,
+  getChamberStatusFromCleared,
   getChambersByFloor,
-  PREVIEW_CLEARED_CHAMBER,
   type Chamber,
 } from "@/content/chambers";
+import { usePlayerProgress } from "@/hooks/usePlayerProgress";
 import { ChamberCard } from "./ChamberCard";
 
 const FLOORS: Chamber["floor"][] = [1, 2, 3];
 
 export function ChamberTrack() {
+  const { progress, loading } = usePlayerProgress();
+
   return (
     <div className="space-y-16">
       {FLOORS.map((floor) => {
@@ -27,7 +31,7 @@ export function ChamberTrack() {
                 </h2>
               </div>
               <span className="font-mono text-xs text-stone-500">
-                {chambers.length} chambers
+                {loading ? "…" : `${chambers.length} chambers`}
               </span>
             </div>
 
@@ -41,12 +45,19 @@ export function ChamberTrack() {
                 {chambers.map((chamber) => (
                   <li key={chamber.slug} className="relative sm:pl-10">
                     <span
-                      className="absolute left-2.5 top-8 hidden h-3 w-3 rounded-full border-2 border-moss bg-stone-900 sm:left-4 sm:block"
+                      className={`absolute left-2.5 top-8 hidden h-3 w-3 rounded-full border-2 bg-stone-900 sm:left-4 sm:block ${
+                        chamber.isBoss
+                          ? "border-blood animate-ember-flicker"
+                          : "border-moss"
+                      }`}
                       aria-hidden
                     />
                     <ChamberCard
                       chamber={chamber}
-                      status={getChamberStatus(chamber.id, PREVIEW_CLEARED_CHAMBER)}
+                      status={getChamberStatusFromCleared(
+                        chamber.id,
+                        progress.cleared,
+                      )}
                     />
                   </li>
                 ))}

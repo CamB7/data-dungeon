@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { loadProgress, saveProgress, type PlayerProgress } from "@/lib/progress";
+import { useState } from "react";
+import { usePlayerProgress } from "@/hooks/usePlayerProgress";
+import { saveProgress } from "@/lib/progress";
 
 export function AdaptiveRecommend() {
-  const [progress, setProgress] = useState<PlayerProgress | null>(null);
+  const { progress } = usePlayerProgress();
   const [loading, setLoading] = useState(false);
   const [rec, setRec] = useState<{
     slug: string;
@@ -14,12 +15,7 @@ export function AdaptiveRecommend() {
     focusSkill: string;
   } | null>(null);
 
-  useEffect(() => {
-    setProgress(loadProgress());
-  }, []);
-
   async function recommend() {
-    if (!progress) return;
     setLoading(true);
     try {
       const recentFails = progress.attempts
@@ -38,16 +34,14 @@ export function AdaptiveRecommend() {
       const data = await res.json();
       if (res.ok) {
         setRec(data);
-        const next = {
+        saveProgress({
           ...progress,
           lastRecommend: {
             slug: data.slug,
             reason: data.reason,
             at: Date.now(),
           },
-        };
-        saveProgress(next);
-        setProgress(next);
+        });
       }
     } finally {
       setLoading(false);
@@ -92,11 +86,9 @@ export function AdaptiveRecommend() {
           </Link>
         </div>
       ) : null}
-      {progress ? (
-        <p className="mt-4 font-mono text-[11px] text-stone-500">
-          Cleared {progress.cleared.length} · {progress.xp} XP · local progress
-        </p>
-      ) : null}
+      <p className="mt-4 font-mono text-[11px] text-stone-500">
+        Cleared {progress.cleared.length} · {progress.xp} XP
+      </p>
     </section>
   );
 }

@@ -11,6 +11,13 @@ const skillStyles: Record<SqlSkill, string> = {
   "group-by": "border-stone-500/50 text-stone-300 bg-stone-800/60",
   "inner-join": "border-moss-soft/50 text-moss-soft bg-moss-deep/40",
   "left-join": "border-moss-soft/50 text-moss-soft bg-moss-deep/40",
+  distinct: "border-torch/40 text-torch bg-torch/10",
+  having: "border-stone-500/50 text-stone-300 bg-stone-800/60",
+  case: "border-moss-soft/50 text-moss-soft bg-moss-deep/40",
+  subquery: "border-moss-soft/50 text-moss-soft bg-moss-deep/40",
+  nulls: "border-stone-500/50 text-stone-300 bg-stone-800/60",
+  union: "border-torch/40 text-torch bg-torch/10",
+  exists: "border-moss-soft/50 text-moss-soft bg-moss-deep/40",
   boss: "border-torch bg-torch/20 text-torch font-semibold",
 };
 

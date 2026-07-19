@@ -5,6 +5,7 @@ const SESSION_VERIFIER_PARAM = "neon_auth_session_verifier";
 
 const DESTINATIONS: Record<string, string> = {
   home: "/",
+  dungeon: "/dungeon",
 };
 
 export async function GET(

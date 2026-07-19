@@ -77,6 +77,7 @@ export async function loadDbProgress(userId: string): Promise<PlayerProgress> {
   return progress;
 }
 
+/** Record a failed attempt — updates weak skills only. Clears go through claim + AI seal. */
 export async function recordDbAttempt(input: {
   userId: string;
   slug: string;
@@ -93,38 +94,68 @@ export async function recordDbAttempt(input: {
       if (skill === "boss") continue;
       weakSkills[skill] = (weakSkills[skill] ?? 0) + 1;
     }
-  } else {
-    for (const skill of input.skills) {
-      if (weakSkills[skill]) {
-        weakSkills[skill] = Math.max(0, weakSkills[skill] - 1);
-      }
+    await db
+      .update(users)
+      .set({
+        weakSkills,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, input.userId));
+  }
+
+  return {
+    ...current,
+    weakSkills,
+    attempts: [
+      ...current.attempts,
+      {
+        slug: input.slug,
+        passed: input.passed,
+        at: Date.now(),
+        skills: input.skills,
+      },
+    ].slice(-200),
+  };
+}
+
+/** Award clear only after the Warden AI mints a seal. */
+export async function recordDbClearWithSeal(input: {
+  userId: string;
+  slug: string;
+  skills: string[];
+  xp: number;
+  wardenSeal: string;
+}): Promise<PlayerProgress> {
+  if (!input.wardenSeal.trim()) {
+    throw new Error("Warden seal required — AI critical path.");
+  }
+
+  const db = getDb();
+  const current = await loadDbProgress(input.userId);
+  if (current.cleared.includes(input.slug)) {
+    return current;
+  }
+
+  const weakSkills = { ...current.weakSkills };
+  for (const skill of input.skills) {
+    if (weakSkills[skill]) {
+      weakSkills[skill] = Math.max(0, weakSkills[skill] - 1);
     }
   }
 
-  const alreadyCleared = current.cleared.includes(input.slug);
-  let xp = current.xp;
-  const cleared = [...current.cleared];
+  const chamber = getChamberBySlug(input.slug);
+  const xpAwarded =
+    input.slug === "weekly-raid" ? input.xp : (chamber?.xp ?? input.xp);
 
-  if (input.passed && !alreadyCleared) {
-    const chamber = getChamberBySlug(input.slug);
-    const xpAwarded =
-      input.slug === "weekly-raid"
-        ? input.xp
-        : (chamber?.xp ?? input.xp);
+  await db.insert(chamberCompletions).values({
+    userId: input.userId,
+    chamberSlug: input.slug,
+    xpAwarded,
+    wardenSeal: input.wardenSeal,
+  });
 
-    await db
-      .insert(chamberCompletions)
-      .values({
-        userId: input.userId,
-        chamberSlug: input.slug,
-        xpAwarded,
-      })
-      .onConflictDoNothing();
-
-    xp += xpAwarded;
-    cleared.push(input.slug);
-  }
-
+  const cleared = [...current.cleared, input.slug];
+  const xp = current.xp + xpAwarded;
   const trackCleared = cleared.filter((s) => s !== "weekly-raid").length;
   const level = Math.max(1, trackCleared + 1);
 
@@ -147,7 +178,7 @@ export async function recordDbAttempt(input: {
       ...current.attempts,
       {
         slug: input.slug,
-        passed: input.passed,
+        passed: true,
         at: Date.now(),
         skills: input.skills,
       },

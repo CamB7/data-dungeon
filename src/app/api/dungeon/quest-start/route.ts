@@ -2,6 +2,7 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { DUNGEON_TRACK, SKILL_LABELS } from "@/content/chambers";
+import { loadPrompt } from "@/lib/ai/load-prompt";
 import { WARDEN_MODEL, requireAiKey } from "@/lib/ai/warden";
 
 export const runtime = "nodejs";
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
     const { object } = await generateObject({
       model: WARDEN_MODEL,
       schema,
-      system: `You are the quest master for Data Dungeon. Pick the single best chamber slug from the catalog for the adventurer's intent. Prefer non-boss chambers unless they ask for a challenge. Reason in one short sentence.`,
+      system: loadPrompt("quest-start"),
       prompt: `Intent: ${intent}\n\nCatalog:\n${JSON.stringify(catalog, null, 2)}`,
     });
 

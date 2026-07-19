@@ -21,11 +21,11 @@ export default function DungeonTrackPage() {
           Dungeon track · AI coach
         </p>
         <h1 className="mt-3 font-display text-4xl font-black tracking-wide text-foreground sm:text-5xl">
-          The First Descent
+          The Lockward
         </h1>
         <p className="mt-4 text-lg font-light leading-relaxed text-stone-300">
-          Ten chambers across three floors — plus an AI Warden, adaptive pathing, and a weekly
-          generated raid.
+          Section I · five floors, eighteen chambers — plus an AI Warden, adaptive pathing, and a
+          weekly generated raid.
         </p>
       </div>
 

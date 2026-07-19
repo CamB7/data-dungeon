@@ -32,18 +32,23 @@ const statusLabels: Record<ChamberStatus, string> = {
 export function ChamberCard({ chamber, status }: ChamberCardProps) {
   const isLocked = status === "locked";
   const href = `/dungeon/chamber/${chamber.slug}`;
-  const styles = chamber.isBoss ? bossStatusStyles : statusStyles;
+  const styles = chamber.isBoss || chamber.isSectionBoss ? bossStatusStyles : statusStyles;
+  const isBossish = Boolean(chamber.isBoss || chamber.isSectionBoss);
 
   return (
     <Link
       href={href}
       className={`group relative block rounded-2xl border p-5 transition hover:-translate-y-0.5 ${
-        chamber.isBoss
+        isBossish
           ? "hover:border-blood/70"
           : "hover:border-moss/60"
       } ${styles[status]} ${isLocked ? "hover:opacity-90" : ""}`}
     >
-      {chamber.isBoss ? (
+      {chamber.isSectionBoss ? (
+        <span className="absolute -top-2.5 right-4 rounded-full border border-blood bg-stone-950 px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-blood uppercase animate-ember-flicker">
+          Section Boss
+        </span>
+      ) : chamber.isBoss ? (
         <span className="absolute -top-2.5 right-4 rounded-full border border-blood bg-stone-950 px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-blood uppercase animate-ember-flicker">
           Boss
         </span>
@@ -56,7 +61,7 @@ export function ChamberCard({ chamber, status }: ChamberCardProps) {
         <span
           className={`font-mono text-[10px] tracking-wider uppercase ${
             status === "current"
-              ? chamber.isBoss
+              ? isBossish
                 ? "text-blood"
                 : "text-moss"
               : status === "cleared"
@@ -72,7 +77,7 @@ export function ChamberCard({ chamber, status }: ChamberCardProps) {
 
       <h3
         className={`mt-2 font-display text-xl font-bold tracking-wide text-foreground ${
-          chamber.isBoss
+          isBossish
             ? "group-hover:text-blood"
             : "group-hover:text-moss"
         }`}
@@ -93,7 +98,7 @@ export function ChamberCard({ chamber, status }: ChamberCardProps) {
         </span>
         <span
           className={`text-xs text-stone-500 transition ${
-            chamber.isBoss ? "group-hover:text-blood" : "group-hover:text-torch"
+            isBossish ? "group-hover:text-blood" : "group-hover:text-torch"
           }`}
         >
           {isLocked ? "Preview →" : "Enter →"}

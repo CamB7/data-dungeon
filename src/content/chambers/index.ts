@@ -1,8 +1,23 @@
 import { DUNGEON_TRACK } from "./track";
-import type { Chamber, ChamberStatus } from "./types";
+import type { Chamber, ChamberStatus, DungeonSection } from "./types";
+import { DUNGEON_SECTIONS, floorsInSection } from "./sections";
 
-export type { Chamber, ChamberStatus, ChamberTable, SqlSkill } from "./types";
+export type {
+  Chamber,
+  ChamberFloor,
+  ChamberStatus,
+  ChamberTable,
+  DungeonSection,
+  SqlSkill,
+} from "./types";
+export { FLOORS_PER_SECTION, sectionIdForFloor } from "./types";
 export { DUNGEON_TRACK, FLOOR_LABELS } from "./track";
+export {
+  DUNGEON_SECTIONS,
+  floorsInSection,
+  getSectionById,
+  getSectionForFloor,
+} from "./sections";
 
 export function getChambers(): Chamber[] {
   return DUNGEON_TRACK;
@@ -52,6 +67,19 @@ export function getChambersByFloor(floor: Chamber["floor"]): Chamber[] {
   return DUNGEON_TRACK.filter((chamber) => chamber.floor === floor);
 }
 
+export function getTrackFloors(): number[] {
+  return Array.from(new Set(DUNGEON_TRACK.map((c) => c.floor))).sort(
+    (a, b) => a - b,
+  );
+}
+
+export function getLiveSections(): DungeonSection[] {
+  const liveFloors = new Set(getTrackFloors());
+  return DUNGEON_SECTIONS.filter((section) =>
+    floorsInSection(section).some((f) => liveFloors.has(f)),
+  );
+}
+
 export function getAdjacentChambers(slug: string): {
   prev?: Chamber;
   next?: Chamber;
@@ -79,5 +107,12 @@ export const SKILL_LABELS: Record<Chamber["skills"][number], string> = {
   "group-by": "GROUP BY",
   "inner-join": "INNER JOIN",
   "left-join": "LEFT JOIN",
+  distinct: "DISTINCT",
+  having: "HAVING",
+  case: "CASE",
+  subquery: "Subquery",
+  nulls: "NULL",
+  union: "UNION",
+  exists: "EXISTS",
   boss: "Boss",
 };

@@ -2,25 +2,20 @@
 
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
+import { shellTokens, type ShellVariant } from "@/lib/theme";
 
 type AuthStatusLinkProps = {
-  /** Boss chambers use the blood palette. */
-  variant?: "default" | "boss";
+  variant?: ShellVariant;
   signedOutLabel?: string;
 };
 
 export function AuthStatusLink({
-  variant = "default",
+  variant = "lockward",
   signedOutLabel = "Sign in",
 }: AuthStatusLinkProps) {
   const { data: session, isPending } = authClient.useSession();
-  const isBoss = variant === "boss";
-
-  const pillClass = `rounded-full border px-4 py-2 transition ${
-    isBoss
-      ? "border-blood/40 text-blood hover:border-blood hover:bg-blood/10"
-      : "border-moss/40 text-moss hover:border-moss hover:bg-moss/10"
-  }`;
+  const t = shellTokens(variant);
+  const pillClass = `rounded-full border px-4 py-2 transition ${t.pill}`;
 
   if (isPending) {
     return (

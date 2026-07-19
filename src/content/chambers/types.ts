@@ -15,6 +15,16 @@ export type SqlSkill =
   | "nulls"
   | "union"
   | "exists"
+  | "like"
+  | "between"
+  | "avg"
+  | "self-join"
+  | "offset"
+  | "in"
+  | "coalesce"
+  | "cast"
+  | "window"
+  | "round"
   | "boss";
 
 export type ChamberTable = {

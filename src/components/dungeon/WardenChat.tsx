@@ -13,12 +13,15 @@ type WardenChatProps = {
     message?: string;
   };
   autoPromptOnFail?: boolean;
+  /** Salt Crypts ice-cyan accents */
+  salt?: boolean;
 };
 
 export function WardenChat({
   slug,
   failContext,
   autoPromptOnFail,
+  salt = false,
 }: WardenChatProps) {
   const [messages, setMessages] = useState<Msg[]>([
     {
@@ -113,9 +116,19 @@ export function WardenChat({
   }, [autoPromptOnFail, failContext]);
 
   return (
-    <div className="rounded-2xl border border-torch/25 bg-stone-950/90 shadow-[0_0_40px_rgba(232,184,109,0.06)]">
+    <div
+      className={`rounded-2xl border bg-stone-950/90 ${
+        salt
+          ? "border-brine/35 shadow-[0_0_40px_rgba(125,240,255,0.1)]"
+          : "border-torch/25 shadow-[0_0_40px_rgba(232,184,109,0.06)]"
+      }`}
+    >
       <div className="border-b border-stone-700/80 px-4 py-3">
-        <p className="font-mono text-[11px] tracking-wider text-torch uppercase">
+        <p
+          className={`font-mono text-[11px] tracking-wider uppercase ${
+            salt ? "text-brine" : "text-torch"
+          }`}
+        >
           Ask the Warden
         </p>
         <p className="mt-1 text-xs text-stone-500">
@@ -127,7 +140,11 @@ export function WardenChat({
           <div
             key={`${msg.role}-${i}`}
             className={`text-sm leading-relaxed ${
-              msg.role === "assistant" ? "text-stone-300" : "text-moss"
+              msg.role === "assistant"
+                ? "text-stone-300"
+                : salt
+                  ? "text-brine"
+                  : "text-moss"
             }`}
           >
             <span className="font-mono text-[10px] tracking-wider uppercase text-stone-500">
@@ -148,13 +165,19 @@ export function WardenChat({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask for a hint…"
-          className="flex-1 rounded-xl border border-stone-700 bg-stone-900/80 px-3 py-2 text-sm text-foreground outline-none focus:border-torch/50"
+          className={`flex-1 rounded-xl border border-stone-700 bg-stone-900/80 px-3 py-2 text-sm text-foreground outline-none ${
+            salt ? "focus:border-brine/60" : "focus:border-torch/50"
+          }`}
           disabled={streaming}
         />
         <button
           type="submit"
           disabled={streaming || !input.trim()}
-          className="rounded-full bg-torch/90 px-4 py-2 text-sm font-semibold text-stone-950 transition hover:bg-torch disabled:opacity-50"
+          className={`rounded-full px-4 py-2 text-sm font-semibold text-stone-950 transition disabled:opacity-50 ${
+            salt
+              ? "bg-brine hover:bg-brine-glow"
+              : "bg-torch/90 hover:bg-torch"
+          }`}
         >
           Send
         </button>

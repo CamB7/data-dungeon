@@ -10,7 +10,7 @@ export const DUNGEON_SECTIONS: DungeonSection[] = [
     id: 1,
     slug: "the-lockward",
     name: "The Lockward",
-    tagline: "Prison ledgers, ash rivers, and the first seal.",
+    tagline: "Iron locks, confiscated ledgers, ash rivers, and the first seal.",
     floorStart: 1,
     floorEnd: FLOORS_PER_SECTION,
   },
@@ -52,6 +52,10 @@ export function getSectionById(id: number): DungeonSection | undefined {
   return DUNGEON_SECTIONS.find((s) => s.id === id);
 }
 
+export function getSectionBySlug(slug: string): DungeonSection | undefined {
+  return DUNGEON_SECTIONS.find((s) => s.slug === slug);
+}
+
 export function getSectionForFloor(floor: number): DungeonSection | undefined {
   return DUNGEON_SECTIONS.find(
     (s) => floor >= s.floorStart && floor <= s.floorEnd,
@@ -64,4 +68,9 @@ export function floorsInSection(section: DungeonSection): number[] {
     floors.push(f);
   }
   return floors;
+}
+
+export function sectionPath(section: DungeonSection | string): string {
+  const slug = typeof section === "string" ? section : section.slug;
+  return `/dungeon/section/${slug}`;
 }

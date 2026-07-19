@@ -28,7 +28,7 @@ export default function AuthPage() {
 
       <main className="relative z-10 flex flex-1 items-center justify-center px-6 pb-16">
         <div className="w-full max-w-md">
-          <div className="rounded-2xl border border-moss/25 bg-stone-950/90 p-8 shadow-[0_0_60px_rgba(93,255,177,0.08)] sm:p-10">
+          <div className="rounded-2xl border border-moss/25 bg-stone-950/90 p-8 shadow-[0_0_60px_rgba(168,201,160,0.08)] sm:p-10">
             <p className="font-mono text-xs tracking-[0.25em] text-torch uppercase">
               Enter the dungeon
             </p>

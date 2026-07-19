@@ -1,6 +1,7 @@
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { getChamberBySlug } from "@/content/chambers";
+import { loadPrompt } from "@/lib/ai/load-prompt";
 import { WARDEN_MODEL, chamberContextBlock, requireAiKey } from "@/lib/ai/warden";
 import { serializeResultPreview, type QueryResult } from "@/lib/sql/sandbox";
 
@@ -45,16 +46,16 @@ export async function POST(request: Request) {
     ? chamberContextBlock(chamber)
     : "Weekly raid chamber (schema may vary).";
 
-  const prompt =
-    mode === "recap"
-      ? `The adventurer CLEARED this chamber. Write a 2–3 sentence loot recap: what SQL skill they practiced and why it matters. Dungeon voice, no full query dump.\n\n${context}\n\nTheir winning SQL:\n${sql}\n\nResult:\n${serializeResultPreview(result)}`
-      : `Explain what this result set means in plain English tied to the chamber story. 2–4 sentences. Do not reveal the solution query.\n\n${context}\n\nTheir SQL:\n${sql}\n\nResult:\n${serializeResultPreview(result)}`;
+  const isRecap = mode === "recap";
+  const system = loadPrompt(isRecap ? "warden-recap" : "warden-explain");
+  const prompt = isRecap
+    ? `${context}\n\nTheir winning SQL:\n${sql}\n\nResult:\n${serializeResultPreview(result)}`
+    : `${context}\n\nTheir SQL:\n${sql}\n\nResult:\n${serializeResultPreview(result)}`;
 
   try {
     const { text } = await generateText({
       model: WARDEN_MODEL,
-      system:
-        "You are the Warden of Data Dungeon. Be clear, brief, and slightly atmospheric.",
+      system,
       prompt,
     });
     return NextResponse.json({ text });

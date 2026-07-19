@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { EmailAuthForm } from "@/components/EmailAuthForm";
-import { GoogleSignIn } from "@/components/GoogleSignIn";
+import { AuthPanel } from "@/components/AuthPanel";
 
 export const metadata: Metadata = {
   title: "Sign in — Data Dungeon",
@@ -41,18 +40,8 @@ export default function AuthPage() {
             </p>
 
             <div className="mt-8">
-              <EmailAuthForm />
+              <AuthPanel />
             </div>
-
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-stone-700/80" />
-              <span className="font-mono text-[11px] tracking-wider text-stone-500 uppercase">
-                or
-              </span>
-              <div className="h-px flex-1 bg-stone-700/80" />
-            </div>
-
-            <GoogleSignIn label="Continue with Google" />
 
             <p className="mt-6 text-center font-mono text-[11px] tracking-wide text-stone-500">
               Progress saves to your adventurer profile

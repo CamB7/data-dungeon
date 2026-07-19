@@ -6,6 +6,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "cell-block-zero",
     floor: 1,
     floorName: "Entry Halls",
+    sectionId: 1,
     title: "Cell Block Zero",
     subtitle: "Read the prison roster",
     flavor:
@@ -29,6 +30,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "torchlight-archive",
     floor: 1,
     floorName: "Entry Halls",
+    sectionId: 1,
     title: "Torchlight Archive",
     subtitle: "Name only what you need",
     flavor:
@@ -52,6 +54,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "sorting-pit",
     floor: 1,
     floorName: "Entry Halls",
+    sectionId: 1,
     title: "The Sorting Pit",
     subtitle: "Rank by threat level",
     flavor:
@@ -75,6 +78,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "gate-of-limits",
     floor: 1,
     floorName: "Entry Halls",
+    sectionId: 1,
     title: "Gate of Limits",
     subtitle: "Only a few may pass",
     flavor:
@@ -98,6 +102,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "wardens-filter",
     floor: 2,
     floorName: "Warden's Wing",
+    sectionId: 1,
     title: "Warden's Filter",
     subtitle: "Block the unworthy",
     flavor:
@@ -121,6 +126,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "counting-bones",
     floor: 2,
     floorName: "Warden's Wing",
+    sectionId: 1,
     title: "Counting Bones",
     subtitle: "Tally the ossuary",
     flavor:
@@ -143,6 +149,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "guild-ledger",
     floor: 2,
     floorName: "Warden's Wing",
+    sectionId: 1,
     title: "Guild Ledger",
     subtitle: "Tally loot by guild",
     flavor:
@@ -166,6 +173,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "two-door-riddle",
     floor: 3,
     floorName: "Deep Vault",
+    sectionId: 1,
     title: "Two-Door Riddle",
     subtitle: "Match keys to doors",
     flavor:
@@ -194,6 +202,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "left-catacombs",
     floor: 3,
     floorName: "Deep Vault",
+    sectionId: 1,
     title: "Left Catacombs",
     subtitle: "Tombs without occupants",
     flavor:
@@ -222,6 +231,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     slug: "loot-vault-boss",
     floor: 3,
     floorName: "Deep Vault",
+    sectionId: 1,
     title: "Loot Vault Boss",
     subtitle: "The warden's final ledger",
     flavor:
@@ -251,10 +261,239 @@ export const DUNGEON_TRACK: Chamber[] = [
     starterQuery: "SELECT prisoners.name, quests.title, loot.gold\nFROM prisoners\n",
     hint: "Chain JOINs across three tables, filter rarity, then ORDER BY gold DESC.",
   },
+  {
+    id: 11,
+    slug: "echo-gallery",
+    floor: 4,
+    floorName: "Ashen Depths",
+    sectionId: 1,
+    title: "Echo Gallery",
+    subtitle: "Hear each crime once",
+    flavor:
+      "Whispers bounce off the gallery walls — every crime shouted twice, thrice. The archivist wants each distinct crime written once on the slate.",
+    objective:
+      "Return each unique crime from the prisoners table, ordered alphabetically.",
+    skills: ["distinct"],
+    xp: 65,
+    tables: [
+      {
+        name: "prisoners",
+        description: "Roster with repeated crime labels",
+        columns: ["id", "name", "crime", "cell"],
+      },
+    ],
+    starterQuery: "SELECT ",
+    hint: "SELECT DISTINCT column removes duplicate values.",
+  },
+  {
+    id: 12,
+    slug: "tithe-threshold",
+    floor: 4,
+    floorName: "Ashen Depths",
+    sectionId: 1,
+    title: "Tithe Threshold",
+    subtitle: "Only rich guilds pass",
+    flavor:
+      "The ash-river ferry demands a tithe. Only guilds whose confiscated gold totals more than 50 may cross — the poor stay in the shallows.",
+    objective:
+      "Return guild_name and total gold (as total_gold) for guilds whose SUM(gold) is greater than 50, ordered by guild_name.",
+    skills: ["having", "group-by"],
+    xp: 70,
+    tables: [
+      {
+        name: "loot",
+        description: "Confiscated treasure by guild",
+        columns: ["id", "item", "gold", "guild_name"],
+      },
+    ],
+    starterQuery: "SELECT guild_name, SUM(gold) AS total_gold\nFROM loot\n",
+    hint: "HAVING filters groups after GROUP BY — unlike WHERE, which filters rows first.",
+  },
+  {
+    id: 13,
+    slug: "mask-of-roles",
+    floor: 4,
+    floorName: "Ashen Depths",
+    sectionId: 1,
+    title: "Mask of Roles",
+    subtitle: "Label the danger",
+    flavor:
+      "Guards wear blank masks until ranked. Classify each prisoner: threat 4+ is 'high', 2–3 is 'mid', otherwise 'low'.",
+    objective:
+      "Return name, threat_level, and a risk column from a CASE expression ('high' / 'mid' / 'low'), ordered by name.",
+    skills: ["case"],
+    xp: 75,
+    tables: [
+      {
+        name: "prisoners",
+        description: "Prisoners with threat ratings",
+        columns: ["id", "name", "threat_level", "cell"],
+      },
+    ],
+    starterQuery: "SELECT name, threat_level,\n  CASE\n",
+    hint: "CASE WHEN … THEN … WHEN … THEN … ELSE … END builds a derived column.",
+  },
+  {
+    id: 14,
+    slug: "hollow-throne-boss",
+    floor: 4,
+    floorName: "Ashen Depths",
+    sectionId: 1,
+    title: "Hollow Throne Boss",
+    subtitle: "Who still holds a key",
+    flavor:
+      "The hollow throne only opens for heroes who still carry a vault key. Find prisoners whose id appears among key holders, join their active quest, and rank by quest XP.",
+    objective:
+      "Return prisoner name and quest title for prisoners who hold a key (id IN keys.holder_id), ordered by quest xp_reward descending, then name.",
+    skills: ["boss", "subquery", "inner-join", "order-by"],
+    xp: 120,
+    isBoss: true,
+    tables: [
+      {
+        name: "prisoners",
+        description: "Adventurers in the ash depths",
+        columns: ["id", "name", "class"],
+      },
+      {
+        name: "keys",
+        description: "Vault keys and who holds them",
+        columns: ["id", "key_name", "holder_id"],
+      },
+      {
+        name: "quests",
+        description: "Quests assigned to heroes",
+        columns: ["id", "title", "xp_reward", "assigned_to"],
+      },
+    ],
+    starterQuery:
+      "SELECT prisoners.name, quests.title\nFROM prisoners\nINNER JOIN quests ON quests.assigned_to = prisoners.id\n",
+    hint: "Filter with WHERE id IN (SELECT holder_id FROM keys), then ORDER BY xp_reward DESC.",
+  },
+  {
+    id: 15,
+    slug: "forgotten-cells",
+    floor: 5,
+    floorName: "Gate of Seals",
+    sectionId: 1,
+    title: "Forgotten Cells",
+    subtitle: "Names that never came",
+    flavor:
+      "Some roster slots were carved and never filled. The seal clerk needs every prisoner who has no recorded crime — the blanks that haunt the ledger.",
+    objective:
+      "Return name and cell for prisoners where crime IS NULL, ordered by name.",
+    skills: ["nulls"],
+    xp: 80,
+    tables: [
+      {
+        name: "prisoners",
+        description: "Roster with missing crime values",
+        columns: ["id", "name", "cell", "crime"],
+      },
+    ],
+    starterQuery: "SELECT name, cell\nFROM prisoners\n",
+    hint: "IS NULL finds missing values — equality checks like = NULL never match.",
+  },
+  {
+    id: 16,
+    slug: "twin-ledgers",
+    floor: 5,
+    floorName: "Gate of Seals",
+    sectionId: 1,
+    title: "Twin Ledgers",
+    subtitle: "Merge two rolls",
+    flavor:
+      "Day shift and night shift keep separate rolls. The gate will not open until both lists are stacked into one ordered column of names.",
+    objective:
+      "Return a single name column that unions day_roll and night_roll names, ordered alphabetically.",
+    skills: ["union"],
+    xp: 85,
+    tables: [
+      {
+        name: "day_roll",
+        description: "Prisoners logged on day shift",
+        columns: ["id", "name"],
+      },
+      {
+        name: "night_roll",
+        description: "Prisoners logged on night shift",
+        columns: ["id", "name"],
+      },
+    ],
+    starterQuery: "SELECT name FROM day_roll\nUNION\n",
+    hint: "UNION stacks two SELECTs with the same column shape and drops duplicates.",
+  },
+  {
+    id: 17,
+    slug: "proof-of-presence",
+    floor: 5,
+    floorName: "Gate of Seals",
+    sectionId: 1,
+    title: "Proof of Presence",
+    subtitle: "Who still holds a torch",
+    flavor:
+      "Only prisoners who still appear in the torch log may approach the seal. Prove presence with EXISTS — no half-measures.",
+    objective:
+      "Return prisoner name for those who have at least one row in torch_log (via EXISTS), ordered by name.",
+    skills: ["exists"],
+    xp: 90,
+    tables: [
+      {
+        name: "prisoners",
+        description: "All known prisoners",
+        columns: ["id", "name", "cell"],
+      },
+      {
+        name: "torch_log",
+        description: "Recent torch sightings by prisoner",
+        columns: ["id", "prisoner_id", "seen_on"],
+      },
+    ],
+    starterQuery: "SELECT name\nFROM prisoners\nWHERE EXISTS (\n",
+    hint: "EXISTS (SELECT 1 FROM … WHERE …) is true when the subquery finds any row.",
+  },
+  {
+    id: 18,
+    slug: "lockward-seal-boss",
+    floor: 5,
+    floorName: "Gate of Seals",
+    sectionId: 1,
+    title: "Lockward Seal Boss",
+    subtitle: "Close the first section",
+    flavor:
+      "The Lockward's final seal demands proof: heroes who still hold a key, whose crime is known (not null), ranked by the gold on their legendary haul.",
+    objective:
+      "Return name and gold for prisoners who EXISTS in keys, have a non-null crime, and own legendary loot — ordered by gold descending.",
+    skills: ["boss", "exists", "nulls", "inner-join", "where", "order-by"],
+    xp: 150,
+    isBoss: true,
+    isSectionBoss: true,
+    tables: [
+      {
+        name: "prisoners",
+        description: "Candidates for the Lockward seal",
+        columns: ["id", "name", "crime", "class"],
+      },
+      {
+        name: "keys",
+        description: "Keys still in circulation",
+        columns: ["id", "key_name", "holder_id"],
+      },
+      {
+        name: "loot",
+        description: "Personal hauls by prisoner",
+        columns: ["prisoner_id", "item", "gold", "rarity"],
+      },
+    ],
+    starterQuery:
+      "SELECT prisoners.name, loot.gold\nFROM prisoners\nINNER JOIN loot ON loot.prisoner_id = prisoners.id\n",
+    hint: "Combine EXISTS (keys), crime IS NOT NULL, rarity = 'legendary', then ORDER BY gold DESC.",
+  },
 ];
 
-export const FLOOR_LABELS: Record<Chamber["floor"], string> = {
+export const FLOOR_LABELS: Record<number, string> = {
   1: "Floor I — Entry Halls",
   2: "Floor II — Warden's Wing",
   3: "Floor III — Deep Vault",
+  4: "Floor IV — Ashen Depths",
+  5: "Floor V — Gate of Seals",
 };

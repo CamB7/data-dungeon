@@ -3,6 +3,7 @@ import {
   jsonb,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -41,6 +42,8 @@ export const chamberCompletions = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     chamberSlug: text("chamber_slug").notNull(),
     xpAwarded: integer("xp_awarded").notNull().default(0),
+    /** AI Warden seal — required on claim (critical path). See prompts/warden-seal.md */
+    wardenSeal: text("warden_seal"),
     completedAt: timestamp("completed_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -50,6 +53,17 @@ export const chamberCompletions = pgTable(
   }),
 );
 
+export const feedback = pgTable("feedback", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+  email: text("email"),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type ChamberCompletion = typeof chamberCompletions.$inferSelect;
+export type Feedback = typeof feedback.$inferSelect;

@@ -9,7 +9,7 @@ export type AuthFormState = {
   success?: string;
 } | null;
 
-export type OAuthDestination = "home";
+export type OAuthDestination = "home" | "dungeon";
 
 export async function signInWithGoogleAction(destination: OAuthDestination = "home") {
   const headerStore = await headers();
@@ -63,7 +63,7 @@ export async function signUpWithEmailAction(
     return { error: error.message || "Could not create account." };
   }
 
-  redirect("/");
+  redirect("/dungeon");
 }
 
 export async function signInWithEmailAction(
@@ -86,5 +86,5 @@ export async function signInWithEmailAction(
     return { error: error.message || "Invalid email or password." };
   }
 
-  redirect("/");
+  redirect("/dungeon");
 }

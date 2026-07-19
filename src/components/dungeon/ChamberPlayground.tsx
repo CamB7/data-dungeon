@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { Chamber } from "@/content/chambers";
 import { usePlayerProgress } from "@/hooks/usePlayerProgress";
 import type { QueryResult } from "@/lib/sql/sandbox";
@@ -15,15 +16,9 @@ type RunResponse = {
 };
 
 type ChamberPlaygroundProps = {
-  // Built-in track chambers — omit unused import noise
   chamber: Pick<
     Chamber,
-    | "slug"
-    | "title"
-    | "starterQuery"
-    | "skills"
-    | "xp"
-    | "id"
+    "slug" | "title" | "starterQuery" | "skills" | "xp" | "id"
   >;
   filename: string;
 };
@@ -31,11 +26,13 @@ type ChamberPlaygroundProps = {
 export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps) {
   const [sql, setSql] = useState(chamber.starterQuery);
   const [running, setRunning] = useState(false);
+  const [claiming, setClaiming] = useState(false);
   const [outcome, setOutcome] = useState<RunResponse | null>(null);
-  const [explain, setExplain] = useState<string | null>(null);
-  const [explaining, setExplaining] = useState(false);
+  const [seal, setSeal] = useState<string | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
   const [askFail, setAskFail] = useState(false);
-  const { progress, recordLocalAndSync } = usePlayerProgress();
+  const { progress, authenticated, recordLocalAndSync, refresh } =
+    usePlayerProgress();
 
   const cleared = progress.cleared.includes(chamber.slug);
 
@@ -48,36 +45,10 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
     };
   }, [outcome, sql]);
 
-  async function requestExplain(
-    mode: "explain" | "recap",
-    result?: QueryResult,
-    query = sql,
-  ) {
-    if (!result) return;
-    setExplaining(true);
-    try {
-      const res = await fetch("/api/dungeon/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode,
-          slug: chamber.slug,
-          sql: query,
-          result,
-        }),
-      });
-      const data = (await res.json()) as { text?: string; error?: string };
-      setExplain(data.text ?? data.error ?? "No explanation.");
-    } catch {
-      setExplain("The Warden could not explain that result.");
-    } finally {
-      setExplaining(false);
-    }
-  }
-
   async function runQuery() {
     setRunning(true);
-    setExplain(null);
+    setSeal(null);
+    setClaimError(null);
     setAskFail(false);
     try {
       const res = await fetch("/api/dungeon/run", {
@@ -88,24 +59,42 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
       const data = (await res.json()) as RunResponse;
       setOutcome(data);
 
-      if (data.ok && data.passed !== undefined) {
+      if (data.ok && data.passed === false) {
         await recordLocalAndSync({
           slug: chamber.slug,
-          passed: Boolean(data.passed),
+          passed: false,
           skills: chamber.skills,
           xp: chamber.xp,
         });
-
-        if (data.passed) {
-          void requestExplain("recap", data.result, sql);
-        } else {
-          setAskFail(true);
-        }
+        setAskFail(true);
       }
     } catch {
       setOutcome({ ok: false, error: "Network error running query." });
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function claimLoot() {
+    setClaiming(true);
+    setClaimError(null);
+    try {
+      const res = await fetch("/api/dungeon/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: chamber.slug, sql }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setClaimError(data.error ?? "Could not claim loot.");
+        return;
+      }
+      setSeal(data.seal ?? null);
+      await refresh();
+    } catch {
+      setClaimError("Network error claiming loot.");
+    } finally {
+      setClaiming(false);
     }
   }
 
@@ -124,7 +113,7 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
           <button
             type="button"
             onClick={() => void runQuery()}
-            disabled={running}
+            disabled={running || claiming}
             className="rounded-full bg-moss px-4 py-1.5 font-mono text-[11px] tracking-wide text-stone-950 uppercase transition hover:bg-moss/90 disabled:opacity-60"
           >
             {running ? "Running…" : "Run query"}
@@ -137,52 +126,65 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
           className="w-full resize-y bg-transparent p-5 font-mono text-[13px] leading-6 text-moss/90 outline-none sm:text-sm"
           spellCheck={false}
         />
-        <div className="border-t border-stone-700/80 px-4 py-3">
+        <div className="border-t border-stone-700/80 px-4 py-3 space-y-3">
           {!outcome ? (
             <p className="font-mono text-[11px] text-stone-500">
-              Results appear here after you run a query.
+              Results appear here after you run a query. Correct rows alone are not enough —
+              the Warden must seal your loot.
             </p>
           ) : outcome.error ? (
             <p className="text-sm text-torch">{outcome.error}</p>
           ) : (
-            <div className="space-y-3">
+            <>
               <p
                 className={`text-sm ${outcome.passed ? "text-moss" : "text-torch"}`}
               >
                 {outcome.message}
-                {cleared && outcome.passed ? " · XP already claimed" : null}
+                {cleared ? " · Already sealed" : null}
               </p>
-              {outcome.result ? (
-                <ResultTable result={outcome.result} />
+              {outcome.result ? <ResultTable result={outcome.result} /> : null}
+
+              {outcome.passed && !cleared ? (
+                <div className="rounded-xl border border-moss/30 bg-moss/5 p-4 space-y-3">
+                  <p className="text-sm text-stone-300">
+                    Result set matches.{" "}
+                    <span className="text-moss">
+                      Claim loot requires a live AI Warden seal
+                    </span>{" "}
+                    — without Gemini, the chamber stays uncleared.
+                  </p>
+                  {!authenticated ? (
+                    <p className="text-sm text-torch">
+                      <Link href="/auth" className="underline hover:text-moss">
+                        Sign in
+                      </Link>{" "}
+                      to claim — progress is isolated per adventurer in Neon.
+                    </p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void claimLoot()}
+                      disabled={claiming}
+                      className="rounded-full bg-moss px-5 py-2.5 text-sm font-semibold text-stone-950 transition hover:bg-moss/90 disabled:opacity-60"
+                    >
+                      {claiming ? "Warden sealing…" : "Claim loot (AI seal)"}
+                    </button>
+                  )}
+                  {claimError ? (
+                    <p className="text-sm text-torch">{claimError}</p>
+                  ) : null}
+                </div>
               ) : null}
-              <div className="flex flex-wrap gap-2">
-                {outcome.result && !outcome.passed ? (
-                  <button
-                    type="button"
-                    disabled={explaining}
-                    onClick={() => void requestExplain("explain", outcome.result)}
-                    className="rounded-full border border-stone-600/60 px-3 py-1.5 text-xs text-stone-300 transition hover:border-torch/50 hover:text-torch"
-                  >
-                    {explaining ? "Reading…" : "Explain my result"}
-                  </button>
-                ) : null}
-                {outcome.result && outcome.passed ? (
-                  <button
-                    type="button"
-                    disabled={explaining}
-                    onClick={() => void requestExplain("recap", outcome.result)}
-                    className="rounded-full border border-moss/40 px-3 py-1.5 text-xs text-moss transition hover:bg-moss/10"
-                  >
-                    {explaining ? "Writing…" : "Loot recap"}
-                  </button>
-                ) : null}
-              </div>
-              {explain ? (
-                <p className="rounded-xl border border-stone-700/80 bg-stone-900/80 p-3 text-sm leading-relaxed text-stone-300">
-                  {explain}
+
+              {seal ? (
+                <p className="rounded-xl border border-torch/30 bg-torch/5 p-3 text-sm leading-relaxed text-stone-200">
+                  <span className="font-mono text-[10px] tracking-wider text-torch uppercase">
+                    Warden seal
+                  </span>
+                  <span className="mt-2 block">{seal}</span>
                 </p>
               ) : null}
-            </div>
+            </>
           )}
         </div>
       </div>

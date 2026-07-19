@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthStatusLink } from "@/components/AuthStatusLink";
 
 type DungeonShellProps = {
   children: React.ReactNode;
@@ -65,15 +66,12 @@ export function DungeonShell({
             Track map
           </Link>
           <Link
-            href="/auth"
-            className={`rounded-full border px-4 py-2 transition ${
-              isBoss
-                ? "border-blood/40 text-blood hover:border-blood hover:bg-blood/10"
-                : "border-moss/40 text-moss hover:border-moss hover:bg-moss/10"
-            }`}
+            href="/feedback"
+            className={`transition ${isBoss ? "hover:text-blood" : "hover:text-torch"}`}
           >
-            Sign in
+            Feedback
           </Link>
+          <AuthStatusLink variant={variant} />
         </nav>
       </header>
 

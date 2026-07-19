@@ -2,9 +2,9 @@ import { streamText, type ModelMessage } from "ai";
 import { getChamberBySlug } from "@/content/chambers";
 import {
   WARDEN_MODEL,
-  WARDEN_SYSTEM,
   chamberContextBlock,
   requireAiKey,
+  wardenCoachSystem,
 } from "@/lib/ai/warden";
 import { serializeResultPreview, type QueryResult } from "@/lib/sql/sandbox";
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         }).failContext
       : undefined;
 
-  let system = WARDEN_SYSTEM;
+  let system = wardenCoachSystem();
   if (chamber) {
     system += `\n\n${chamberContextBlock(chamber)}`;
   } else {

@@ -35,20 +35,25 @@ export default function ChamberPage({ params }: ChamberPageProps) {
   if (!chamber) notFound();
 
   const { prev, next } = getAdjacentChambers(chamber.slug);
+  const isBossish = Boolean(chamber.isBoss || chamber.isSectionBoss);
 
   return (
-    <DungeonShell variant={chamber.isBoss ? "boss" : "default"}>
+    <DungeonShell variant={isBossish ? "boss" : "default"}>
       <article>
         <header className="mb-8">
           <div className="flex flex-wrap items-center gap-3">
             <p
               className={`font-mono text-xs tracking-[0.25em] uppercase ${
-                chamber.isBoss ? "text-blood" : "text-torch"
+                isBossish ? "text-blood" : "text-torch"
               }`}
             >
               Chamber {String(chamber.id).padStart(2, "0")} · {chamber.floorName}
             </p>
-            {chamber.isBoss ? (
+            {chamber.isSectionBoss ? (
+              <span className="rounded-full border border-blood bg-blood/10 px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-blood uppercase animate-ember-flicker">
+                Section Boss
+              </span>
+            ) : chamber.isBoss ? (
               <span className="rounded-full border border-blood bg-blood/10 px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-blood uppercase animate-ember-flicker">
                 Boss
               </span>
@@ -58,10 +63,11 @@ export default function ChamberPage({ params }: ChamberPageProps) {
             {chamber.title}
           </h1>
           <p className="mt-2 text-lg text-stone-400">{chamber.subtitle}</p>
-          {chamber.isBoss ? (
+          {isBossish ? (
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-ash">
-              The air thins. Torchlight dies to embers. One wrong result set and the vault stays
-              sealed.
+              {chamber.isSectionBoss
+                ? "The Lockward seal waits. Five floors of queries stand behind you — one wrong result set and the gate stays shut."
+                : "The air thins. Torchlight dies to embers. One wrong result set and the vault stays sealed."}
             </p>
           ) : null}
           <div className="mt-4 flex flex-wrap gap-2">

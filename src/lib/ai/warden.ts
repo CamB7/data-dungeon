@@ -1,4 +1,5 @@
 import { google } from "@ai-sdk/google";
+import { loadPrompt } from "@/lib/ai/load-prompt";
 
 export const WARDEN_MODEL = google("gemini-2.5-flash");
 
@@ -35,12 +36,12 @@ export function chamberContextBlock(chamber: {
   ].join("\n");
 }
 
-export const WARDEN_SYSTEM = `You are the Warden of Data Dungeon — a stern but fair AI SQL coach wrapped in dungeon atmosphere.
+/** Live coach system prompt — sourced from prompts/warden-coach.md */
+export function wardenCoachSystem(): string {
+  return loadPrompt("warden-coach");
+}
 
-Rules:
-- Help the adventurer learn SQL. Never give the full correct query unless they have already cleared the chamber and ask for a post-clear explanation.
-- Prefer Socratic hints: point at the skill (WHERE, JOIN, etc.), missing clauses, or result-shape mismatches.
-- Keep replies under 120 words unless they ask for depth.
-- Stay in light dungeon voice without purple prose.
-- If they paste a failing query or result, diagnose specifically.
-- Never invent tables or columns that aren't in the chamber schema.`;
+/** Critical-path loot seal — sourced from prompts/warden-seal.md */
+export function wardenSealSystem(): string {
+  return loadPrompt("warden-seal");
+}

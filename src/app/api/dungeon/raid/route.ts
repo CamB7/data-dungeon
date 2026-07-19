@@ -1,6 +1,7 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { loadPrompt } from "@/lib/ai/load-prompt";
 import { WARDEN_MODEL, requireAiKey } from "@/lib/ai/warden";
 import { weekKey, type WeeklyRaidStored } from "@/lib/progress";
 import {
@@ -65,13 +66,7 @@ export async function POST(request: Request) {
     const { object } = await generateObject({
       model: WARDEN_MODEL,
       schema: raidSchema,
-      system: `Create one SQLite-compatible SQL practice chamber for Data Dungeon.
-Rules:
-- seedSql must CREATE TABLE + INSERT with 3–8 rows; SQLite types only (INTEGER, TEXT).
-- solutionSql must be a single SELECT that returns a deterministic ordered result (include ORDER BY).
-- Theme: dungeon / prison / loot / guilds.
-- Difficulty: intermediate (WHERE + JOIN or GROUP BY).
-- Never use PostgreSQL-only features.`,
+      system: loadPrompt("weekly-raid"),
       prompt: `Generate this week's raid for ${key}. Make it distinct from basic SELECT *.`,
     });
 

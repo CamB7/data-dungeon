@@ -72,6 +72,10 @@ const config: Config = {
           "0%": { transform: "translateY(0)" },
           "100%": { transform: "translateY(-50%)" },
         },
+        "cursor-blink": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.8s ease-out both",
@@ -80,6 +84,7 @@ const config: Config = {
         "torch-pulse": "torch-pulse 4s ease-in-out infinite",
         "ember-flicker": "ember-flicker 3.2s ease-in-out infinite",
         "query-scroll": "query-scroll 28s linear infinite",
+        "cursor-blink": "cursor-blink 1s step-end infinite",
       },
     },
   },

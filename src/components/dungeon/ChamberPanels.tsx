@@ -1,10 +1,24 @@
 import type { ChamberTable } from "@/content/chambers";
 
-export function SchemaPanel({ tables }: { tables: ChamberTable[] }) {
+export function SchemaPanel({
+  tables,
+  salt = false,
+}: {
+  tables: ChamberTable[];
+  salt?: boolean;
+}) {
   return (
-    <div className="rounded-2xl border border-stone-700/80 bg-stone-950/90 overflow-hidden">
+    <div
+      className={`rounded-2xl border bg-stone-950/90 overflow-hidden ${
+        salt ? "border-brine/30" : "border-stone-700/80"
+      }`}
+    >
       <div className="border-b border-stone-700/80 px-4 py-3">
-        <p className="font-mono text-[11px] tracking-wider text-stone-500 uppercase">
+        <p
+          className={`font-mono text-[11px] tracking-wider uppercase ${
+            salt ? "text-brine-soft" : "text-stone-500"
+          }`}
+        >
           Chamber schema
         </p>
       </div>
@@ -12,7 +26,13 @@ export function SchemaPanel({ tables }: { tables: ChamberTable[] }) {
         {tables.map((table) => (
           <div key={table.name} className="p-4">
             <div className="flex items-baseline justify-between gap-2">
-              <code className="font-mono text-sm text-moss">{table.name}</code>
+              <code
+                className={`font-mono text-sm ${
+                  salt ? "text-brine" : "text-moss"
+                }`}
+              >
+                {table.name}
+              </code>
               <span className="text-xs text-stone-500">{table.columns.length} cols</span>
             </div>
             <p className="mt-1 text-xs text-stone-400">{table.description}</p>
@@ -20,7 +40,11 @@ export function SchemaPanel({ tables }: { tables: ChamberTable[] }) {
               {table.columns.map((column) => (
                 <span
                   key={column}
-                  className="rounded-md border border-stone-700/80 bg-stone-900/80 px-2 py-0.5 font-mono text-[11px] text-stone-300"
+                  className={`rounded-md border px-2 py-0.5 font-mono text-[11px] ${
+                    salt
+                      ? "border-brine/25 bg-brine/5 text-salt"
+                      : "border-stone-700/80 bg-stone-900/80 text-stone-300"
+                  }`}
                 >
                   {column}
                 </span>
@@ -43,7 +67,7 @@ export function SqlEditorPlaceholder({
   disabled?: boolean;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-moss/25 bg-stone-950/90 shadow-[0_0_60px_rgba(93,255,177,0.08)]">
+    <div className="overflow-hidden rounded-2xl border border-moss/25 bg-stone-950/90 shadow-[0_0_60px_rgba(168,201,160,0.08)]">
       <div className="flex items-center justify-between gap-2 border-b border-stone-700/80 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-torch-dim" />

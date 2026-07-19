@@ -77,7 +77,7 @@ export function SqlTypewriter({
   const shown = text.slice(0, visible);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-moss/25 bg-stone-950/90 shadow-[0_0_60px_rgba(93,255,177,0.08)]">
+    <div className="relative overflow-hidden rounded-2xl border border-moss/25 bg-stone-950/90 shadow-[0_0_60px_rgba(168,201,160,0.08)]">
       <div className="flex items-center gap-2 border-b border-stone-700/80 px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-torch-dim" />
         <span className="h-2.5 w-2.5 rounded-full bg-moss-soft" />

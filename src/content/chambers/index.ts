@@ -16,7 +16,9 @@ export {
   DUNGEON_SECTIONS,
   floorsInSection,
   getSectionById,
+  getSectionBySlug,
   getSectionForFloor,
+  sectionPath,
 } from "./sections";
 
 export function getChambers(): Chamber[] {
@@ -80,6 +82,18 @@ export function getLiveSections(): DungeonSection[] {
   );
 }
 
+export function isSectionLive(section: DungeonSection): boolean {
+  return getLiveSections().some((s) => s.id === section.id);
+}
+
+export function getChambersBySection(sectionId: number): Chamber[] {
+  return DUNGEON_TRACK.filter((chamber) => chamber.sectionId === sectionId);
+}
+
+export function getSectionXp(sectionId: number): number {
+  return getChambersBySection(sectionId).reduce((sum, c) => sum + c.xp, 0);
+}
+
 export function getAdjacentChambers(slug: string): {
   prev?: Chamber;
   next?: Chamber;
@@ -114,5 +128,15 @@ export const SKILL_LABELS: Record<Chamber["skills"][number], string> = {
   nulls: "NULL",
   union: "UNION",
   exists: "EXISTS",
+  like: "LIKE",
+  between: "BETWEEN",
+  avg: "AVG",
+  "self-join": "Self JOIN",
+  offset: "OFFSET",
+  in: "IN",
+  coalesce: "COALESCE",
+  cast: "CAST",
+  window: "Window",
+  round: "ROUND",
   boss: "Boss",
 };

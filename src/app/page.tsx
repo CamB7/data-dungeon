@@ -23,7 +23,7 @@ export default function Home() {
         {/* Hero — brand + typewriter query panel */}
         <section className="relative z-10 flex min-h-[calc(100vh-5rem)] flex-col justify-center overflow-hidden px-6 pb-16 pt-10 sm:px-8">
           <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_70%_40%,rgba(93,255,177,0.18),transparent_55%),radial-gradient(ellipse_50%_40%_at_20%_80%,rgba(232,184,109,0.12),transparent_50%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_70%_40%,rgba(168,201,160,0.18),transparent_55%),radial-gradient(ellipse_50%_40%_at_20%_80%,rgba(226,181,107,0.14),transparent_50%)]"
             aria-hidden
           />
           <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-overlay bg-grid bg-grid" />
@@ -34,10 +34,11 @@ export default function Home() {
                 Data Dungeon
               </p>
               <h1 className="animate-fade-up-delay mt-4 max-w-2xl font-display text-3xl font-bold leading-tight tracking-wide text-foreground sm:text-4xl md:text-5xl">
-                Learn SQL with an AI Warden who seals every clear.
+                Learn SQL by clearing chambers — not copying answers.
               </h1>
-              <p className="animate-fade-up-delay-2 mt-5 max-w-md text-lg font-light leading-relaxed text-stone-300">
-                Write the query. Prove the result. Earn a Gemini-minted loot seal — or stay stuck.
+              <p className="animate-fade-up-delay-2 mt-5 max-w-lg text-lg font-light leading-relaxed text-stone-300">
+                Write real queries, climb three live sections, and get an AI Warden
+                to seal every clear before it counts.
               </p>
               <HomeHeroCtas />
             </div>
@@ -120,11 +121,10 @@ export default function Home() {
               Create your adventurer
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-wide text-foreground sm:text-4xl">
-              Sign up and keep your clears
+              Sign up and keep your progress
             </h2>
             <p className="mt-4 max-w-xl text-stone-300">
-              Neon Auth (email or Google). Progress and feedback are stored per user in Postgres —
-              not a shared demo account.
+              Create an account with email or Google.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link

@@ -39,7 +39,7 @@ export function QuestStart() {
   }
 
   return (
-    <section className="rounded-2xl border border-moss/25 bg-stone-950/90 p-6 shadow-[0_0_40px_rgba(93,255,177,0.06)]">
+    <section className="rounded-2xl border border-moss/25 bg-stone-950/90 p-6 shadow-[0_0_40px_rgba(168,201,160,0.06)]">
       <p className="font-mono text-xs tracking-[0.25em] text-moss uppercase">
         Natural-language quest start
       </p>

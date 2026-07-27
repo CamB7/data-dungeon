@@ -51,29 +51,43 @@ export function DungeonShell({
         />
       ) : null}
 
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6 sm:px-8">
+      <header className="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-5 sm:px-8 sm:py-6">
         <Link
           href="/"
-          className={`font-display text-sm font-bold tracking-[0.2em] uppercase transition ${t.brand}`}
+          className={`font-display text-sm font-bold tracking-[0.15em] uppercase transition sm:tracking-[0.2em] ${t.brand}`}
         >
           Data Dungeon
         </Link>
-        <nav className={`flex items-center gap-4 text-sm ${t.navMuted}`}>
-          <Link href="/dungeon" className={`transition ${t.accentHover}`}>
+        <nav
+          className={`flex flex-wrap items-center justify-end gap-x-3 gap-y-2 text-sm sm:gap-x-4 ${t.navMuted}`}
+        >
+          <Link
+            href="/dungeon"
+            className={`inline-flex min-h-11 items-center px-1 transition sm:min-h-0 sm:px-0 sm:py-0 ${t.accentHover}`}
+          >
             Sections
           </Link>
-          <Link href="/feedback" className={`transition ${t.accentHover}`}>
+          <Link
+            href="/dungeon/chart"
+            className={`inline-flex min-h-11 items-center px-1 transition sm:min-h-0 sm:px-0 sm:py-0 ${t.accentHover}`}
+          >
+            Chart
+          </Link>
+          <Link
+            href="/feedback"
+            className={`hidden min-h-11 items-center px-1 transition sm:inline-flex sm:min-h-0 sm:px-0 sm:py-0 ${t.accentHover}`}
+          >
             Feedback
           </Link>
           <AuthStatusLink variant={variant} />
         </nav>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-20 pt-2 sm:px-8">
+      <main className="relative z-10 mx-auto max-w-6xl px-5 pb-20 pt-2 sm:px-8">
         {backHref ? (
           <Link
             href={backHref}
-            className={`mb-6 inline-block text-sm transition ${t.backLink}`}
+            className={`mb-6 inline-block max-w-full truncate text-sm transition sm:max-w-none ${t.backLink}`}
           >
             {backLabel}
           </Link>

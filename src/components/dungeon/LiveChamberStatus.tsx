@@ -2,6 +2,7 @@
 
 import { getChamberStatusFromCleared } from "@/content/chambers";
 import { usePlayerProgress } from "@/hooks/usePlayerProgress";
+import type { SectionThemeId } from "@/lib/theme";
 import { ChamberStatusBanner } from "./ProgressBar";
 
 export function LiveChamberStatus({
@@ -11,7 +12,7 @@ export function LiveChamberStatus({
 }: {
   chamberId: number;
   salt?: boolean;
-  theme?: "lockward" | "salt" | "spire" | "hollow" | "throne";
+  theme?: SectionThemeId;
 }) {
   const { progress } = usePlayerProgress();
   const status = getChamberStatusFromCleared(chamberId, progress.cleared);

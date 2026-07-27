@@ -110,7 +110,7 @@ export default function ChamberPage({ params }: ChamberPageProps) {
               </span>
             ) : null}
           </div>
-          <div className="mt-3 flex items-start gap-4 sm:gap-6">
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
             {isBossish ? (
               <BossEmblem slug={chamber.slug} theme={theme} />
             ) : null}
@@ -155,7 +155,7 @@ export default function ChamberPage({ params }: ChamberPageProps) {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
-          <div className="space-y-6">
+          <div className="order-2 space-y-6 lg:order-1">
             <section
               className={`rounded-2xl border p-6 ${
                 theme === "salt"
@@ -232,39 +232,37 @@ export default function ChamberPage({ params }: ChamberPageProps) {
             <SchemaPanel tables={chamber.tables} salt={salt} />
           </div>
 
-          <ChamberPlayground
-            chamber={chamber}
-            filename={`chamber_${String(chamber.id).padStart(2, "0")}.sql`}
-          />
+          <div className="order-1 lg:order-2">
+            <ChamberPlayground
+              chamber={chamber}
+              filename={`chamber_${String(chamber.id).padStart(2, "0")}.sql`}
+            />
+          </div>
         </div>
 
-        <nav className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-stone-700/60 pt-8">
+        <nav className="mt-12 flex flex-col gap-4 border-t border-stone-700/60 pt-8 sm:flex-row sm:items-center sm:justify-between">
           {prev ? (
             <Link
               href={`/dungeon/chamber/${prev.slug}`}
-              className={`text-sm text-stone-400 transition ${t.accentHover}`}
+              className={`inline-flex min-h-11 max-w-full items-center truncate text-sm text-stone-400 transition sm:min-h-0 sm:max-w-[40%] ${t.accentHover}`}
             >
               ← {prev.title}
             </Link>
-          ) : (
-            <span />
-          )}
+          ) : null}
           <Link
             href={sectionHref}
-            className={`rounded-full border border-stone-600/60 px-5 py-2 text-sm text-stone-300 transition ${t.accentHover}`}
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center self-center rounded-full border border-stone-600/60 px-5 py-2.5 text-sm text-stone-300 transition sm:min-h-0 sm:py-2 ${t.accentHover}`}
           >
             {section?.name ?? "Section"}
           </Link>
           {next ? (
             <Link
               href={`/dungeon/chamber/${next.slug}`}
-              className={`text-sm text-stone-400 transition ${t.accentHover}`}
+              className={`inline-flex min-h-11 max-w-full items-center truncate text-right text-sm text-stone-400 transition sm:min-h-0 sm:max-w-[40%] sm:justify-end ${t.accentHover}`}
             >
               {next.title} →
             </Link>
-          ) : (
-            <span />
-          )}
+          ) : null}
         </nav>
       </article>
     </DungeonShell>

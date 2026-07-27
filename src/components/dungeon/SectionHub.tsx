@@ -7,47 +7,19 @@ import {
   sectionPath,
   type DungeonSection,
 } from "@/content/chambers";
-import { themeForSectionId, type SectionThemeId } from "@/lib/theme";
+import { sectionChrome, themeForSectionId } from "@/lib/theme";
 
-const cardChrome: Record<
-  SectionThemeId,
-  { border: string; title: string; tag: string; cta: string }
-> = {
-  lockward: {
-    border: "border-moss/30 hover:border-moss/60",
-    title: "text-moss",
-    tag: "text-torch",
-    cta: "text-moss group-hover:text-torch",
-  },
-  salt: {
-    border: "border-brine/30 hover:border-brine/60",
-    title: "text-brine",
-    tag: "text-brine-soft",
-    cta: "text-brine group-hover:text-brine-glow",
-  },
-  spire: {
-    border: "border-spire/30 hover:border-spire/60",
-    title: "text-spire",
-    tag: "text-spire-soft",
-    cta: "text-spire group-hover:text-spire-glow",
-  },
-  hollow: {
-    border: "border-hollow/30 hover:border-hollow/60",
-    title: "text-hollow",
-    tag: "text-hollow-soft",
-    cta: "text-hollow group-hover:text-hollow-glow",
-  },
-  throne: {
-    border: "border-throne/30 hover:border-throne/60",
-    title: "text-throne",
-    tag: "text-throne-soft",
-    cta: "text-throne group-hover:text-throne-glow",
-  },
+/** Hub card borders on /dungeon — distinct trim per late section. */
+const HUB_CARD_BORDER: Partial<Record<number, string>> = {
+  4: "border-redgrey/40 hover:border-redgrey/60",
+  5: "border-crimsontrim/40 hover:border-copper/55",
+  6: "border-goldline/40 hover:border-goldline/60",
 };
 
 function SectionCard({ section }: { section: DungeonSection }) {
   const theme = themeForSectionId(section.id);
-  const chrome = cardChrome[theme];
+  const chrome = sectionChrome(theme);
+  const hubBorder = HUB_CARD_BORDER[section.id] ?? chrome.hubBorder;
   const live = isSectionLive(section);
   const chambers = getChambersBySection(section.id);
   const xp = getSectionXp(section.id);
@@ -56,18 +28,18 @@ function SectionCard({ section }: { section: DungeonSection }) {
   return (
     <Link
       href={href}
-      className={`group relative block rounded-2xl border bg-stone-950/50 p-6 transition hover:-translate-y-0.5 ${chrome.border} ${
+      className={`group relative block rounded-2xl border p-6 transition hover:-translate-y-0.5 ${hubBorder} ${chrome.hubBg} ${
         live ? "" : "opacity-80"
       }`}
     >
       <p
-        className={`font-mono text-xs tracking-[0.25em] uppercase ${chrome.tag}`}
+        className={`font-mono text-xs tracking-[0.25em] uppercase ${chrome.hubTag}`}
       >
         Section {section.id}
         {!live ? " · Sealed" : ""}
       </p>
       <h2
-        className={`mt-2 font-display text-2xl font-black tracking-wide sm:text-3xl ${chrome.title}`}
+        className={`mt-2 font-display text-2xl font-black tracking-wide sm:text-3xl ${chrome.hubTitle}`}
       >
         {section.name}
       </h2>
@@ -79,7 +51,7 @@ function SectionCard({ section }: { section: DungeonSection }) {
           Floors {section.floorStart}–{section.floorEnd}
           {live ? ` · ${chambers.length} chambers · ${xp} XP` : " · Coming soon"}
         </span>
-        <span className={`text-sm transition ${chrome.cta}`}>
+        <span className={`text-sm transition ${chrome.hubCta}`}>
           {live ? "Enter →" : "Preview →"}
         </span>
       </div>

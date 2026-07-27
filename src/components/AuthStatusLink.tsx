@@ -15,7 +15,7 @@ export function AuthStatusLink({
 }: AuthStatusLinkProps) {
   const { data: session, isPending } = authClient.useSession();
   const t = shellTokens(variant);
-  const pillClass = `rounded-full border px-4 py-2 transition ${t.pill}`;
+  const pillClass = `inline-flex max-w-[9rem] items-center truncate rounded-full border px-4 py-2 text-sm transition sm:max-w-none ${t.pill}`;
 
   if (isPending) {
     return (

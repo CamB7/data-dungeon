@@ -47,7 +47,7 @@ export default function SectionPage({ params }: SectionPageProps) {
     >
       <header className="mb-12 max-w-2xl">
         <p
-          className={`font-mono text-xs tracking-[0.25em] uppercase ${t.accent}`}
+          className={`font-mono text-xs tracking-[0.25em] uppercase ${t.accentSecondary}`}
         >
           Section {section.id}
           {!live ? " · Sealed" : ""}

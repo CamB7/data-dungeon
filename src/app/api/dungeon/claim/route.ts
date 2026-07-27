@@ -14,8 +14,6 @@ import {
 } from "@/lib/progress-server";
 import { notifySlack } from "@/lib/slack";
 import { runChamberQuery, serializeResultPreview } from "@/lib/sql/sandbox";
-import { loadCurrentWeeklyRaid } from "@/lib/raid-store";
-import { runRaidQuery } from "@/lib/sql/raid";
 
 export const runtime = "nodejs";
 
@@ -56,19 +54,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "slug and sql required." }, { status: 400 });
   }
 
-  let outcome;
-  if (slug === "weekly-raid") {
-    const raid = loadCurrentWeeklyRaid();
-    if (!raid) {
-      return NextResponse.json({ error: "No weekly raid." }, { status: 404 });
-    }
-    outcome = await runRaidQuery(raid.seedSql, raid.solutionSql, sql);
-  } else {
-    if (!getChamberBySlug(slug)) {
-      return NextResponse.json({ error: "Unknown chamber." }, { status: 404 });
-    }
-    outcome = await runChamberQuery(slug, sql);
+  const chamber = getChamberBySlug(slug);
+  if (!chamber) {
+    return NextResponse.json({ error: "Unknown chamber." }, { status: 404 });
   }
+
+  const outcome = await runChamberQuery(slug, sql);
 
   if (!outcome.ok || !outcome.passed || !outcome.result) {
     return NextResponse.json(
@@ -80,20 +71,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const chamber = getChamberBySlug(slug);
-  const xp = chamber?.xp ?? (slug === "weekly-raid" ? 75 : 25);
-  const skills = chamber?.skills ?? ["boss"];
-
-  const context = chamber
-    ? chamberContextBlock(chamber)
-    : "Weekly AI-generated raid chamber.";
-
   let seal: string;
   try {
     const { text } = await generateText({
       model: WARDEN_MODEL,
       system: wardenSealSystem(),
-      prompt: `${context}\n\nWinning SQL:\n${sql}\n\nResult preview:\n${serializeResultPreview(outcome.result)}\n\nAdventurer: ${sessionUser.name ?? sessionUser.email}`,
+      prompt: `${chamberContextBlock(chamber)}\n\nWinning SQL:\n${sql}\n\nResult preview:\n${serializeResultPreview(outcome.result)}\n\nAdventurer: ${sessionUser.name ?? sessionUser.email}`,
     });
     seal = text.trim();
     if (!seal) throw new Error("Empty seal");
@@ -112,14 +95,13 @@ export async function POST(request: Request) {
   const progress = await recordDbClearWithSeal({
     userId: sessionUser.id,
     slug,
-    skills,
-    xp,
+    skills: chamber.skills,
+    xp: chamber.xp,
     wardenSeal: seal,
   });
 
-  const title = chamber?.title ?? "Weekly Raid";
   await notifySlack(
-    `🗝 *${sessionUser.name ?? sessionUser.email}* cleared *${title}* (+${xp} XP)\n>${seal.replace(/\n/g, " ")}`,
+    `🗝 *${sessionUser.name ?? sessionUser.email}* cleared *${chamber.title}* (+${chamber.xp} XP)\n>${seal.replace(/\n/g, " ")}`,
   );
 
   return NextResponse.json({

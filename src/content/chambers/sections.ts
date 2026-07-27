@@ -3,7 +3,8 @@ import { FLOORS_PER_SECTION } from "./types";
 
 /**
  * Five floors per section. Only sections with authored chambers appear on the track.
- * Names locked: The Lockward → Salt Crypts → Index Spire → Null Cathedral → Query Throne.
+ * Names locked: The Lockward → Salt Crypts → Index Spire → Null Cathedral →
+ * Fractured Loom → Query Throne.
  */
 export const DUNGEON_SECTIONS: DungeonSection[] = [
   {
@@ -40,11 +41,19 @@ export const DUNGEON_SECTIONS: DungeonSection[] = [
   },
   {
     id: 5,
+    slug: "the-fractured-loom",
+    name: "The Fractured Loom",
+    tagline: "Warp and weft — stitch subqueries into woven chains.",
+    floorStart: 21,
+    floorEnd: 25,
+  },
+  {
+    id: 6,
     slug: "the-query-throne",
     name: "The Query Throne",
     tagline: "Endgame synthesis — one query to rule the dungeon.",
-    floorStart: 21,
-    floorEnd: 25,
+    floorStart: 26,
+    floorEnd: 30,
   },
 ];
 

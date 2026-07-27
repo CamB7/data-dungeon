@@ -14,6 +14,7 @@ export type SqlSkill =
   | "subquery"
   | "nulls"
   | "union"
+  | "union-all"
   | "exists"
   | "like"
   | "between"
@@ -25,6 +26,7 @@ export type SqlSkill =
   | "cast"
   | "window"
   | "round"
+  | "cte"
   | "boss";
 
 export type ChamberTable = {

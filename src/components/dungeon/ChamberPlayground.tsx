@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { Chamber } from "@/content/chambers";
 import { usePlayerProgress } from "@/hooks/usePlayerProgress";
 import type { QueryResult } from "@/lib/sql/sandbox";
-import { themeForSectionId, type SectionThemeId } from "@/lib/theme";
+import { themeForSectionId, sectionChrome } from "@/lib/theme";
 import { WardenChat } from "@/components/dungeon/WardenChat";
 
 type RunResponse = {
@@ -26,86 +26,9 @@ type ChamberPlaygroundProps = {
   filename: string;
 };
 
-const playgroundChrome: Record<
-  SectionThemeId,
-  {
-    border: string;
-    dotA: string;
-    dotB: string;
-    btn: string;
-    editor: string;
-    pass: string;
-    warn: string;
-    panel: string;
-    seal: string;
-    sealLabel: string;
-  }
-> = {
-  lockward: {
-    border: "border-moss/25 shadow-[0_0_60px_rgba(168,201,160,0.08)]",
-    dotA: "bg-torch-dim",
-    dotB: "bg-moss-soft",
-    btn: "bg-moss hover:bg-moss/90",
-    editor: "text-moss/90",
-    pass: "text-moss",
-    warn: "text-torch",
-    panel: "border-moss/30 bg-moss/5",
-    seal: "border-torch/30 bg-torch/5",
-    sealLabel: "text-torch",
-  },
-  salt: {
-    border: "border-brine/40 shadow-[0_0_60px_rgba(125,240,255,0.12)]",
-    dotA: "bg-brine-soft",
-    dotB: "bg-brine",
-    btn: "bg-brine hover:bg-brine-glow",
-    editor: "text-brine",
-    pass: "text-brine",
-    warn: "text-salt-dim",
-    panel: "border-brine/40 bg-brine/10",
-    seal: "border-brine/35 bg-brine/10",
-    sealLabel: "text-brine",
-  },
-  spire: {
-    border: "border-spire/40 shadow-[0_0_60px_rgba(184,197,214,0.12)]",
-    dotA: "bg-spire-soft",
-    dotB: "bg-spire",
-    btn: "bg-spire hover:bg-spire-glow text-spire-deep",
-    editor: "text-spire",
-    pass: "text-spire",
-    warn: "text-spire-soft",
-    panel: "border-spire/40 bg-spire/10",
-    seal: "border-spire/35 bg-spire/10",
-    sealLabel: "text-spire",
-  },
-  hollow: {
-    border: "border-hollow/35",
-    dotA: "bg-hollow-soft",
-    dotB: "bg-hollow",
-    btn: "bg-hollow hover:bg-hollow-glow text-hollow-deep",
-    editor: "text-hollow",
-    pass: "text-hollow",
-    warn: "text-hollow-soft",
-    panel: "border-hollow/35 bg-hollow/10",
-    seal: "border-hollow/30 bg-hollow/10",
-    sealLabel: "text-hollow",
-  },
-  throne: {
-    border: "border-throne/40",
-    dotA: "bg-throne-soft",
-    dotB: "bg-throne",
-    btn: "bg-throne hover:bg-throne-glow text-throne-deep",
-    editor: "text-throne",
-    pass: "text-throne",
-    warn: "text-throne-soft",
-    panel: "border-throne/40 bg-throne/10",
-    seal: "border-throne/35 bg-throne/10",
-    sealLabel: "text-throne",
-  },
-};
-
 export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps) {
   const theme = themeForSectionId(chamber.sectionId ?? 1);
-  const chrome = playgroundChrome[theme];
+  const chrome = sectionChrome(theme);
   const salt = theme === "salt";
   const [sql, setSql] = useState(chamber.starterQuery);
   const [running, setRunning] = useState(false);
@@ -184,14 +107,14 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
   return (
     <div className="space-y-6">
       <div
-        className={`overflow-hidden rounded-2xl border bg-stone-950/90 ${chrome.border}`}
+        className={`overflow-hidden rounded-2xl border bg-stone-950/90 ${chrome.pgBorder}`}
       >
-        <div className="flex items-center justify-between gap-2 border-b border-stone-700/80 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className={`h-2.5 w-2.5 rounded-full ${chrome.dotA}`} />
-            <span className={`h-2.5 w-2.5 rounded-full ${chrome.dotB}`} />
-            <span className="h-2.5 w-2.5 rounded-full bg-stone-500" />
-            <span className="ml-3 font-mono text-[11px] tracking-wider text-stone-500">
+        <div className="flex flex-col gap-3 border-b border-stone-700/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${chrome.pgDotA}`} />
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${chrome.pgDotB}`} />
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-stone-500" />
+            <span className="ml-1 truncate font-mono text-xs tracking-wider text-stone-500 sm:ml-3">
               {filename}
             </span>
           </div>
@@ -199,7 +122,7 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
             type="button"
             onClick={() => void runQuery()}
             disabled={running || claiming}
-            className={`rounded-full px-4 py-1.5 font-mono text-[11px] tracking-wide text-stone-950 uppercase transition disabled:opacity-60 ${chrome.btn}`}
+            className={`w-full shrink-0 min-h-11 rounded-full px-5 py-2.5 font-mono text-xs tracking-wide text-stone-950 uppercase transition disabled:opacity-60 sm:w-auto sm:min-h-0 sm:py-1.5 sm:text-[11px] ${chrome.pgBtn}`}
           >
             {running ? "Running…" : "Run query"}
           </button>
@@ -207,8 +130,8 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
         <textarea
           value={sql}
           onChange={(e) => setSql(e.target.value)}
-          rows={8}
-          className={`w-full resize-y bg-transparent p-5 font-mono text-[13px] leading-6 outline-none sm:text-sm ${chrome.editor}`}
+          rows={10}
+          className={`w-full resize-y bg-transparent p-4 font-mono text-base leading-6 outline-none sm:p-5 sm:text-sm ${chrome.pgEditor}`}
           spellCheck={false}
         />
         <div className="border-t border-stone-700/80 px-4 py-3 space-y-3">
@@ -218,12 +141,12 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
               the Warden must seal your loot.
             </p>
           ) : outcome.error ? (
-            <p className={`text-sm ${chrome.warn}`}>{outcome.error}</p>
+            <p className={`text-sm ${chrome.pgWarn}`}>{outcome.error}</p>
           ) : (
             <>
               <p
                 className={`text-sm ${
-                  outcome.passed ? chrome.pass : chrome.warn
+                  outcome.passed ? chrome.pgPass : chrome.pgWarn
                 }`}
               >
                 {outcome.message}
@@ -232,16 +155,16 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
               {outcome.result ? <ResultTable result={outcome.result} /> : null}
 
               {outcome.passed && !cleared ? (
-                <div className={`rounded-xl border p-4 space-y-3 ${chrome.panel}`}>
+                <div className={`rounded-xl border p-4 space-y-3 ${chrome.pgPanel}`}>
                   <p className="text-sm text-stone-300">
                     Result set matches.{" "}
-                    <span className={chrome.pass}>
+                    <span className={chrome.pgPass}>
                       Claim loot requires a live AI Warden seal
                     </span>{" "}
                     — without Gemini, the chamber stays uncleared.
                   </p>
                   {!authenticated ? (
-                    <p className={`text-sm ${chrome.warn}`}>
+                    <p className={`text-sm ${chrome.pgWarn}`}>
                       <Link
                         href="/auth"
                         className={`underline hover:opacity-80`}
@@ -255,23 +178,23 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
                       type="button"
                       onClick={() => void claimLoot()}
                       disabled={claiming}
-                      className={`rounded-full px-5 py-2.5 text-sm font-semibold text-stone-950 transition disabled:opacity-60 ${chrome.btn}`}
+                      className={`rounded-full px-5 py-2.5 text-sm font-semibold text-stone-950 transition disabled:opacity-60 ${chrome.pgBtn}`}
                     >
                       {claiming ? "Warden sealing…" : "Claim loot (AI seal)"}
                     </button>
                   )}
                   {claimError ? (
-                    <p className={`text-sm ${chrome.warn}`}>{claimError}</p>
+                    <p className={`text-sm ${chrome.pgWarn}`}>{claimError}</p>
                   ) : null}
                 </div>
               ) : null}
 
               {seal ? (
                 <p
-                  className={`rounded-xl border p-3 text-sm leading-relaxed text-stone-200 ${chrome.seal}`}
+                  className={`rounded-xl border p-3 text-sm leading-relaxed text-stone-200 ${chrome.pgSeal}`}
                 >
                   <span
-                    className={`font-mono text-[10px] tracking-wider uppercase ${chrome.sealLabel}`}
+                    className={`font-mono text-[10px] tracking-wider uppercase ${chrome.pgSealLabel}`}
                   >
                     Warden seal
                   </span>
@@ -300,8 +223,8 @@ function ResultTable({ result }: { result: QueryResult }) {
     );
   }
   return (
-    <div className="max-h-56 overflow-auto rounded-xl border border-stone-700/80">
-      <table className="min-w-full text-left font-mono text-[11px]">
+    <div className="max-h-56 overflow-auto rounded-xl border border-stone-700/80 [-webkit-overflow-scrolling:touch]">
+      <table className="min-w-full text-left font-mono text-xs sm:text-sm">
         <thead className="bg-stone-900 text-stone-500">
           <tr>
             {result.columns.map((col) => (

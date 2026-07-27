@@ -3,16 +3,13 @@ import { HomeHeroCtas } from "@/components/HomeHeroCtas";
 import { HomeNav } from "@/components/HomeNav";
 import { SqlTypewriter } from "@/components/SqlTypewriter";
 
-const DEMO_VIDEO_URL =
-  process.env.NEXT_PUBLIC_DEMO_VIDEO_URL?.trim() || "";
-
 export default function Home() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-stone-900 text-foreground">
       <div className="pointer-events-none absolute inset-0 bg-dungeon" />
       <div className="pointer-events-none absolute inset-0 bg-grid bg-grid opacity-40" />
 
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6 sm:px-8">
+      <header className="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-5 sm:px-8 sm:py-6">
         <span className="font-display text-sm font-bold tracking-[0.2em] text-moss uppercase">
           Data Dungeon
         </span>
@@ -69,45 +66,6 @@ export default function Home() {
               mandatory on the critical path: a correct result set still needs a live seal before
               Neon records your clear. Remove the model and progression stops.
             </p>
-          </div>
-        </section>
-
-        {/* Demo */}
-        <section id="demo" className="relative z-10 border-t border-stone-700/60">
-          <div className="mx-auto max-w-6xl px-6 py-20 sm:px-8">
-            <p className="font-mono text-xs tracking-[0.25em] text-torch uppercase">Demo</p>
-            <h2 className="mt-3 font-display text-3xl font-bold tracking-wide text-foreground sm:text-4xl">
-              Thirty seconds in the dungeon
-            </h2>
-            <p className="mt-4 max-w-xl text-stone-300">
-              Sign in, run a chamber query, claim loot with the Warden seal, watch Slack ping on clear.
-            </p>
-            <div className="mt-10 aspect-video w-full overflow-hidden rounded-2xl border border-moss/20 bg-stone-950">
-              {DEMO_VIDEO_URL ? (
-                <iframe
-                  src={DEMO_VIDEO_URL}
-                  title="Data Dungeon demo"
-                  className="h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
-                  <p className="font-mono text-xs tracking-wider text-stone-500 uppercase">
-                    Demo video
-                  </p>
-                  <p className="max-w-md text-sm text-stone-400">
-                    Add{" "}
-                    <code className="text-moss">NEXT_PUBLIC_DEMO_VIDEO_URL</code> (YouTube/Loom
-                    embed) to show your walkthrough here. Until then:{" "}
-                    <Link href="/dungeon" className="text-torch underline">
-                      open the live dungeon
-                    </Link>
-                    .
-                  </p>
-                </div>
-              )}
-            </div>
           </div>
         </section>
 

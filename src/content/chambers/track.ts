@@ -489,6 +489,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     hint: "Combine EXISTS (keys), crime IS NOT NULL, rarity = 'legendary', then ORDER BY gold DESC.",
   },
   // ─── Section II — The Salt Crypts (floors 6–10) ─────────────────────────
+  // ORDER BY tagged only while pairing with new filters; assumed on later floors.
   // Assumes Lockward skills. Each chamber adds a brine concept or combines known tools.
   {
     id: 19,
@@ -574,7 +575,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "You grouped loot in the Lockward. Now average salinity per pool — AVG is the new piece.",
     objective:
       "Return pool_name and AVG(salinity) as avg_salinity, grouped by pool, ordered by pool_name.",
-    skills: ["avg", "group-by", "order-by"],
+    skills: ["avg", "group-by"],
     xp: 115,
     tables: [
       {
@@ -598,7 +599,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Same grouping habit, two aggregates. Report each trench's shallowest and deepest sounding.",
     objective:
       "Return trench_name, MIN(depth) as min_depth, MAX(depth) as max_depth, ordered by trench_name.",
-    skills: ["group-by", "order-by"],
+    skills: ["group-by"],
     xp: 120,
     tables: [
       {
@@ -623,7 +624,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "HAVING returns from the Lockward tithe. Keep only pools whose average salinity exceeds 20.",
     objective:
       "Return pool_name and AVG(salinity) as avg_salinity for pools with AVG(salinity) > 20, ordered by pool_name.",
-    skills: ["avg", "having", "group-by", "order-by"],
+    skills: ["avg", "having", "group-by"],
     xp: 130,
     tables: [
       {
@@ -647,7 +648,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "INNER JOIN is familiar. Chain three tables — divers to routes to relics — and sort the ledger.",
     objective:
       "Return diver name as diver, route title, and relic name as relic, ordered by diver then relic.",
-    skills: ["inner-join", "order-by"],
+    skills: ["inner-join"],
     xp: 135,
     tables: [
       {
@@ -682,7 +683,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "WHERE is old hat — boolean shape is the drill. Keep wrecks that are deep OR hazardous, but never both calm and shallow.",
     objective:
       "Return name and depth for wrecks where depth >= 40 OR hazardous = 1, ordered by name.",
-    skills: ["where", "order-by"],
+    skills: ["where"],
     xp: 140,
     tables: [
       {
@@ -706,7 +707,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Same LEFT JOIN idea as the Lockward crypts: list every route, even those with no relic yet.",
     objective:
       "Return route title and relic name (null when missing), ordered by route id.",
-    skills: ["left-join", "order-by"],
+    skills: ["left-join"],
     xp: 145,
     tables: [
       {
@@ -735,7 +736,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "New shape: join a table to itself. Pair each apprentice with their mentor's name.",
     objective:
       "Return apprentice and mentor names via self-join on mentor_id, ordered by apprentice.",
-    skills: ["self-join", "order-by"],
+    skills: ["self-join"],
     xp: 150,
     tables: [
       {
@@ -760,7 +761,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "EXISTS is Lockward knowledge. Flip it: who never appears in the beacon log?",
     objective:
       "Return diver name where NOT EXISTS a beacon_log row for that diver, ordered by name.",
-    skills: ["exists", "order-by"],
+    skills: ["exists"],
     xp: 155,
     tables: [
       {
@@ -789,7 +790,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Combine the floor's tools: apprentices who have a mentor and also resurfaced at least once.",
     objective:
       "Return apprentice name for divers with a mentor (self-join) who EXISTS in beacon_log, ordered by name.",
-    skills: ["self-join", "exists", "order-by"],
+    skills: ["self-join", "exists"],
     xp: 165,
     tables: [
       {
@@ -819,7 +820,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Stack brine pattern tools you already drilled: legendary relics whose names taste of Salt.",
     objective:
       "Return name and value where rarity = 'legendary' AND name LIKE '%Salt%', ordered by value descending.",
-    skills: ["like", "where", "order-by"],
+    skills: ["like", "where"],
     xp: 170,
     tables: [
       {
@@ -869,6 +870,7 @@ export const DUNGEON_TRACK: Chamber[] = [
     hint: "EXISTS beacon, GROUP BY diver, HAVING SUM(gold) > 50, ORDER BY total_gold DESC.",
   },
   // ─── Section III — Index Spire (floors 11–15) ────────────────────────────
+  // Window floors teach ranking without redundant ORDER BY tags; OFFSET/LIMIT keep sort explicit.
   // Assumes Lockward + Salt. New tools: OFFSET, IN, COALESCE, CAST, window, ROUND.
   {
     id: 33,
@@ -906,7 +908,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "IN is a tidy WHERE list. Keep shelves stamped 2, 4, and 7.",
     objective:
       "Return id and label where id IN (2, 4, 7), ordered by id.",
-    skills: ["in", "order-by"],
+    skills: ["in"],
     xp: 165,
     tables: [
       {
@@ -954,7 +956,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "NULL handling returns from Forgotten Cells. COALESCE picks a fallback subtitle when dust ate the carving.",
     objective:
       "Return title and COALESCE(subtitle, 'Blank') as subtitle, ordered by id.",
-    skills: ["coalesce", "order-by"],
+    skills: ["coalesce"],
     xp: 180,
     tables: [
       {
@@ -978,7 +980,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Heights were stored as text. CAST them so ORDER BY ranks the tallest first — sorting you already trust.",
     objective:
       "Return label and CAST(height_text AS INTEGER) as height, ordered by height descending.",
-    skills: ["cast", "order-by"],
+    skills: ["cast"],
     xp: 185,
     tables: [
       {
@@ -1002,7 +1004,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Some spans lack a recorded height. Treat missing text as '0', cast to integer, and list the tallest first.",
     objective:
       "Return label and CAST(COALESCE(height_text, '0') AS INTEGER) as height, ordered by height descending.",
-    skills: ["coalesce", "cast", "order-by"],
+    skills: ["coalesce", "cast"],
     xp: 195,
     tables: [
       {
@@ -1102,7 +1104,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "AVG and GROUP BY are familiar from brine measure. ROUND cleans each tier's mean to one decimal.",
     objective:
       "Return tier and ROUND(AVG(reading), 1) as avg_reading, ordered by tier.",
-    skills: ["round", "avg", "group-by", "order-by"],
+    skills: ["round", "avg", "group-by"],
     xp: 220,
     tables: [
       {
@@ -1127,7 +1129,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Join tomes to shelves, but only wings in ('North', 'East') — JOIN and IN together.",
     objective:
       "Return tome title and shelf label for shelves.wing IN ('North', 'East'), ordered by title.",
-    skills: ["inner-join", "in", "order-by"],
+    skills: ["inner-join", "in"],
     xp: 225,
     tables: [
       {
@@ -1156,7 +1158,7 @@ export const DUNGEON_TRACK: Chamber[] = [
       "Join climbers to floors, then ROW_NUMBER by score — window after join, Lockward habit plus Spire tool.",
     objective:
       "Return climber name, floor name as floor_name, and ROW_NUMBER() OVER (ORDER BY score DESC) as rung, ordered by rung.",
-    skills: ["window", "inner-join", "order-by"],
+    skills: ["window", "inner-join"],
     xp: 235,
     tables: [
       {
@@ -1230,6 +1232,778 @@ export const DUNGEON_TRACK: Chamber[] = [
       "SELECT climbers.name, floors.name AS floor_name, climbers.score,\n  RANK() OVER (ORDER BY climbers.score DESC) AS place\nFROM climbers\n",
     hint: "Join floors, filter sealed = 0 and score > AVG subquery, RANK(), ORDER BY place.",
   },
+  // ─── Section IV — Null Cathedral (floors 16–20) ─────────────────────────
+  // Deepens NULL/integrity; ORDER BY only on UNION ALL stack and ranking bosses.
+  // Assumes Lockward + Salt + Index Spire. Deepens NULL handling and integrity rites.
+  {
+    id: 47,
+    slug: "void-register",
+    floor: 16,
+    floorName: "Hollow Nave",
+    sectionId: 4,
+    title: "Void Register",
+    subtitle: "IS NOT NULL",
+    flavor:
+      "You already found blanks with IS NULL in the Lockward. Flip the habit: list saints whose epitaph was carved — not left hollow.",
+    objective:
+      "Return name and epitaph where epitaph IS NOT NULL, ordered by name.",
+    skills: ["nulls"],
+    xp: 265,
+    tables: [
+      {
+        name: "saints",
+        description: "Cathedral saints with optional epitaphs",
+        columns: ["id", "name", "epitaph"],
+      },
+    ],
+    starterQuery: "SELECT name, epitaph\nFROM saints\n",
+    hint: "IS NOT NULL keeps rows where the column has a value.",
+  },
+  {
+    id: 48,
+    slug: "hollow-filter",
+    floor: 16,
+    floorName: "Hollow Nave",
+    sectionId: 4,
+    title: "Hollow Filter",
+    subtitle: "NULL with AND",
+    flavor:
+      "The nave clerk wants active acolytes who never swore a vow — two predicates, one WHERE.",
+    objective:
+      "Return name and status where vow IS NULL AND active = 1, ordered by name.",
+    skills: ["nulls", "where"],
+    xp: 275,
+    tables: [
+      {
+        name: "acolytes",
+        description: "Acolytes with optional vows",
+        columns: ["id", "name", "vow", "status", "active"],
+      },
+    ],
+    starterQuery: "SELECT name, status\nFROM acolytes\n",
+    hint: "AND vow IS NULL with active = 1, then ORDER BY name.",
+  },
+  {
+    id: 49,
+    slug: "blank-epitaph",
+    floor: 16,
+    floorName: "Hollow Nave",
+    sectionId: 4,
+    title: "Blank Epitaph",
+    subtitle: "COALESCE in the nave",
+    flavor:
+      "COALESCE returns from Index Spire. Here every missing epitaph reads 'Unknown' on the cathedral slate.",
+    objective:
+      "Return name and COALESCE(epitaph, 'Unknown') as epitaph, ordered by id.",
+    skills: ["coalesce"],
+    xp: 285,
+    tables: [
+      {
+        name: "saints",
+        description: "Saints with carved or missing epitaphs",
+        columns: ["id", "name", "epitaph"],
+      },
+    ],
+    starterQuery: "SELECT name, COALESCE(epitaph, 'Unknown') AS epitaph\nFROM saints\n",
+    hint: "COALESCE(epitaph, 'Unknown') then ORDER BY id.",
+  },
+  {
+    id: 50,
+    slug: "orphan-pews",
+    floor: 17,
+    floorName: "Absence Choir",
+    sectionId: 4,
+    title: "Orphan Pews",
+    subtitle: "LEFT JOIN + IS NULL",
+    flavor:
+      "Same LEFT JOIN idea as the Lockward crypts — list every pew, then keep only those with no occupant.",
+    objective:
+      "Return pew label for pews with no occupant (occupant name IS NULL), ordered by label.",
+    skills: ["left-join", "nulls"],
+    xp: 290,
+    tables: [
+      {
+        name: "pews",
+        description: "Every pew in the choir",
+        columns: ["id", "label"],
+      },
+      {
+        name: "occupants",
+        description: "Who sits in each pew",
+        columns: ["id", "name", "pew_id"],
+      },
+    ],
+    starterQuery: "SELECT pews.label\nFROM pews\n",
+    hint: "LEFT JOIN occupants, WHERE occupants.name IS NULL, ORDER BY label.",
+  },
+  {
+    id: 51,
+    slug: "twin-psalms",
+    floor: 17,
+    floorName: "Absence Choir",
+    sectionId: 4,
+    title: "Twin Psalms",
+    subtitle: "UNION ALL keeps duplicates",
+    flavor:
+      "UNION dropped duplicates in the Lockward. UNION ALL stacks every verse — morning and evening, repeats included.",
+    objective:
+      "Return a single verse column from morning_psalms UNION ALL evening_psalms, ordered by verse.",
+    skills: ["union-all", "order-by"],
+    xp: 300,
+    tables: [
+      {
+        name: "morning_psalms",
+        description: "Verses sung at matins",
+        columns: ["id", "verse"],
+      },
+      {
+        name: "evening_psalms",
+        description: "Verses sung at vespers",
+        columns: ["id", "verse"],
+      },
+    ],
+    starterQuery: "SELECT verse FROM morning_psalms\nUNION ALL\n",
+    hint: "UNION ALL evening_psalms, then ORDER BY verse.",
+  },
+  {
+    id: 52,
+    slug: "rite-label",
+    floor: 17,
+    floorName: "Absence Choir",
+    sectionId: 4,
+    title: "Rite Label",
+    subtitle: "CASE meets NULL",
+    flavor:
+      "CASE from the Ashen Depths, now with missing vows. Stamp each acolyte: unsworn, vow-silence, or sworn.",
+    objective:
+      "Return name, vow, and rite from CASE: NULL vow → 'unsworn', 'silence' → 'vow-silence', else 'sworn', ordered by name.",
+    skills: ["case", "nulls"],
+    xp: 310,
+    tables: [
+      {
+        name: "acolytes",
+        description: "Acolytes with optional vows",
+        columns: ["id", "name", "vow"],
+      },
+    ],
+    starterQuery: "SELECT name, vow,\n  CASE\n",
+    hint: "CASE WHEN vow IS NULL … WHEN vow = 'silence' … ELSE 'sworn' END AS rite.",
+  },
+  {
+    id: 53,
+    slug: "excommunicate",
+    floor: 18,
+    floorName: "Integrity Crypt",
+    sectionId: 4,
+    title: "Excommunicate",
+    subtitle: "NOT IN",
+    flavor:
+      "IN is Index Spire knowledge. NOT IN excludes the excommunicated — who may still serve?",
+    objective:
+      "Return name from clergy where id NOT IN (SELECT id FROM excommunicated), ordered by name.",
+    skills: ["in", "subquery"],
+    xp: 315,
+    tables: [
+      {
+        name: "clergy",
+        description: "All clergy in the crypt",
+        columns: ["id", "name", "rank"],
+      },
+      {
+        name: "excommunicated",
+        description: "Clergy struck from the roll",
+        columns: ["id", "name", "struck_on"],
+      },
+    ],
+    starterQuery: "SELECT name\nFROM clergy\n",
+    hint: "WHERE id NOT IN (SELECT id FROM excommunicated), ORDER BY name.",
+  },
+  {
+    id: 54,
+    slug: "absent-mass",
+    floor: 18,
+    floorName: "Integrity Crypt",
+    sectionId: 4,
+    title: "Absent Mass",
+    subtitle: "NOT EXISTS",
+    flavor:
+      "EXISTS from the Lockward gate. Flip it: clergy who never appear in the attendance ledger.",
+    objective:
+      "Return clergy name where NOT EXISTS a row in attendance for that clergy id, ordered by name.",
+    skills: ["exists"],
+    xp: 325,
+    tables: [
+      {
+        name: "clergy",
+        description: "All clergy",
+        columns: ["id", "name", "rank"],
+      },
+      {
+        name: "attendance",
+        description: "Mass attendance by clergy",
+        columns: ["id", "clergy_id", "mass_on"],
+      },
+    ],
+    starterQuery: "SELECT name\nFROM clergy\nWHERE NOT EXISTS (\n",
+    hint: "NOT EXISTS (SELECT 1 FROM attendance WHERE clergy_id = clergy.id).",
+  },
+  {
+    id: 55,
+    slug: "tithe-null",
+    floor: 18,
+    floorName: "Integrity Crypt",
+    sectionId: 4,
+    title: "Tithe Null",
+    subtitle: "COALESCE inside SUM",
+    flavor:
+      "Some parishes sent no tithe — NULL, not zero. COALESCE before SUM so blanks count as 0 in the total.",
+    objective:
+      "Return parish and SUM(COALESCE(tithe, 0)) as total_tithe, grouped by parish, ordered by parish.",
+    skills: ["coalesce", "group-by"],
+    xp: 335,
+    tables: [
+      {
+        name: "offerings",
+        description: "Tithes by parish (some missing)",
+        columns: ["id", "parish", "tithe"],
+      },
+    ],
+    starterQuery:
+      "SELECT parish, SUM(COALESCE(tithe, 0)) AS total_tithe\nFROM offerings\n",
+    hint: "SUM(COALESCE(tithe, 0)) with GROUP BY parish.",
+  },
+  {
+    id: 56,
+    slug: "hollow-join",
+    floor: 19,
+    floorName: "Fractured Transept",
+    sectionId: 4,
+    title: "Hollow Join",
+    subtitle: "LEFT JOIN + COALESCE",
+    flavor:
+      "Every saint must appear — even those with no assigned chapel. Fill missing chapel names with 'Unassigned'.",
+    objective:
+      "Return saint name and COALESCE(chapel, 'Unassigned') as chapel via LEFT JOIN, ordered by saint name.",
+    skills: ["left-join", "coalesce"],
+    xp: 340,
+    tables: [
+      {
+        name: "saints",
+        description: "Cathedral saints",
+        columns: ["id", "name", "chapel_id"],
+      },
+      {
+        name: "chapels",
+        description: "Chapel names",
+        columns: ["id", "chapel"],
+      },
+    ],
+    starterQuery: "SELECT saints.name,\n  COALESCE(chapels.chapel, 'Unassigned') AS chapel\nFROM saints\n",
+    hint: "LEFT JOIN chapels, COALESCE the chapel column, ORDER BY saints.name.",
+  },
+  {
+    id: 57,
+    slug: "rank-the-hollow",
+    floor: 19,
+    floorName: "Fractured Transept",
+    sectionId: 4,
+    title: "Rank the Hollow",
+    subtitle: "Window + COALESCE",
+    flavor:
+      "Some devotees left no devotion score. Treat NULL as 0 with COALESCE, then ROW_NUMBER the faithful.",
+    objective:
+      "Return name and ROW_NUMBER() OVER (ORDER BY COALESCE(devotion, 0) DESC) as standing, ordered by standing.",
+    skills: ["window", "coalesce", "order-by"],
+    xp: 350,
+    tables: [
+      {
+        name: "devotees",
+        description: "Devotees with optional devotion scores",
+        columns: ["id", "name", "devotion"],
+      },
+    ],
+    starterQuery:
+      "SELECT name, ROW_NUMBER() OVER (ORDER BY COALESCE(devotion, 0) DESC) AS standing\nFROM devotees\n",
+    hint: "COALESCE(devotion, 0) inside the window ORDER BY, then ORDER BY standing.",
+  },
+  {
+    id: 58,
+    slug: "integrity-rite",
+    floor: 19,
+    floorName: "Fractured Transept",
+    sectionId: 4,
+    title: "Integrity Rite",
+    subtitle: "JOIN + NULL + IN",
+    flavor:
+      "Only relics with a real shrine assignment and wings in East or West pass the integrity rite.",
+    objective:
+      "Return relic name and shrine wing for relics with non-null shrine_id on shrines where wing IN ('East', 'West'), ordered by relic name.",
+    skills: ["inner-join", "nulls", "in"],
+    xp: 360,
+    tables: [
+      {
+        name: "relics",
+        description: "Cathedral relics and shrine links",
+        columns: ["id", "name", "shrine_id"],
+      },
+      {
+        name: "shrines",
+        description: "Shrines by wing",
+        columns: ["id", "wing"],
+      },
+    ],
+    starterQuery: "SELECT relics.name, shrines.wing\nFROM relics\n",
+    hint: "INNER JOIN shrines, shrine_id IS NOT NULL, wing IN ('East', 'West'), ORDER BY relics.name.",
+  },
+  {
+    id: 59,
+    slug: "cardinal-prelude",
+    floor: 20,
+    floorName: "Cardinal Void",
+    sectionId: 4,
+    title: "Cardinal Prelude",
+    subtitle: "COALESCE, IN, IS NOT NULL",
+    flavor:
+      "Warmup before the Cardinal: ordained clergy in ranks A or B, with COALESCE on missing titles.",
+    objective:
+      "Return name and COALESCE(title, 'Cleric') as title where ordination IS NOT NULL AND rank_code IN ('A', 'B'), ordered by name.",
+    skills: ["coalesce", "nulls", "in"],
+    xp: 365,
+    tables: [
+      {
+        name: "clergy",
+        description: "Clergy at the cardinal void",
+        columns: ["id", "name", "title", "rank_code", "ordination"],
+      },
+    ],
+    starterQuery: "SELECT name, COALESCE(title, 'Cleric') AS title\nFROM clergy\n",
+    hint: "IS NOT NULL on ordination, IN ('A','B'), COALESCE title, ORDER BY name.",
+  },
+  {
+    id: 60,
+    slug: "null-cardinal",
+    floor: 20,
+    floorName: "Cardinal Void",
+    sectionId: 4,
+    title: "Null Cardinal",
+    subtitle: "Close the Null Cathedral",
+    flavor:
+      "Final rite: clergy who attended mass (EXISTS), with known ordination, on open chapels — rank by tithe with NULL as zero.",
+    objective:
+      "Return clergy name, chapel name as chapel, and RANK() OVER (ORDER BY COALESCE(tithe, 0) DESC) as standing for clergy with ordination IS NOT NULL who EXISTS in attendance, on chapels where sealed = 0, ordered by standing.",
+    skills: ["boss", "window", "exists", "nulls", "inner-join", "coalesce", "order-by"],
+    xp: 390,
+    isBoss: true,
+    isSectionBoss: true,
+    tables: [
+      {
+        name: "clergy",
+        description: "Clergy candidates for the cardinal rite",
+        columns: ["id", "name", "ordination", "chapel_id", "tithe"],
+      },
+      {
+        name: "chapels",
+        description: "Chapels and seal state",
+        columns: ["id", "name", "sealed"],
+      },
+      {
+        name: "attendance",
+        description: "Mass attendance proof",
+        columns: ["id", "clergy_id", "mass_on"],
+      },
+    ],
+    starterQuery:
+      "SELECT clergy.name, chapels.name AS chapel,\n  RANK() OVER (ORDER BY COALESCE(clergy.tithe, 0) DESC) AS standing\nFROM clergy\n",
+    hint: "Join chapels, EXISTS attendance, ordination IS NOT NULL, sealed = 0, COALESCE tithe in RANK(), ORDER BY standing.",
+  },
+  // ─── Section V — Fractured Loom (floors 21–25) ───────────────────────────
+  // Assumes prior sections. WITH chains deepen subquery skill; ORDER BY is assumed unless ranking is the lesson.
+  {
+    id: 61,
+    slug: "warp-thread",
+    floor: 21,
+    floorName: "Warp Hall",
+    sectionId: 5,
+    title: "Warp Thread",
+    subtitle: "WITH names a step",
+    flavor:
+      "The loom clerk names each weave step before the main query runs — a WITH clause is the warp you thread first.",
+    objective:
+      "Return name and skill from active weavers (active = 1) using WITH active AS (...).",
+    skills: ["cte", "where"],
+    xp: 395,
+    tables: [
+      {
+        name: "weavers",
+        description: "Loom weavers and their craft",
+        columns: ["id", "name", "skill", "active"],
+      },
+    ],
+    starterQuery: "WITH active AS (\n  SELECT name, skill FROM weavers\n",
+    hint: "WITH active AS (SELECT name, skill FROM weavers WHERE active = 1), then SELECT from active.",
+  },
+  {
+    id: 62,
+    slug: "weft-count",
+    floor: 21,
+    floorName: "Warp Hall",
+    sectionId: 5,
+    title: "Weft Count",
+    subtitle: "Scalar subquery per row",
+    flavor:
+      "Each weaver's tally lives in a subquery in the SELECT list — count threads without joining the whole spool.",
+    objective:
+      "Return weaver name and thread_count as (SELECT COUNT(*) FROM threads WHERE weaver_id = weavers.id).",
+    skills: ["subquery", "count"],
+    xp: 405,
+    tables: [
+      {
+        name: "weavers",
+        description: "Weavers on the warp hall",
+        columns: ["id", "name"],
+      },
+      {
+        name: "threads",
+        description: "Threads assigned to weavers",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery:
+      "SELECT weavers.name,\n  (SELECT COUNT(*) FROM threads\n",
+    hint: "Scalar subquery: COUNT threads WHERE weaver_id = weavers.id, alias thread_count.",
+  },
+  {
+    id: 63,
+    slug: "anchor-thread",
+    floor: 21,
+    floorName: "Warp Hall",
+    sectionId: 5,
+    title: "Anchor Thread",
+    subtitle: "Filter inside a CTE",
+    flavor:
+      "Name the north-wing threads in WITH, then filter the CTE — the warp is set before the shuttle cuts.",
+    objective:
+      "Return name and tension from north threads with tension >= 40 via WITH north AS (...).",
+    skills: ["cte", "where"],
+    xp: 415,
+    tables: [
+      {
+        name: "threads",
+        description: "Named threads by wing and tension",
+        columns: ["id", "name", "tension", "wing"],
+      },
+    ],
+    starterQuery: "WITH north AS (\n  SELECT name, tension FROM threads\n",
+    hint: "WITH north AS (SELECT … WHERE wing = 'North'), filter tension >= 40, ORDER BY tension DESC.",
+  },
+  {
+    id: 64,
+    slug: "double-weave",
+    floor: 22,
+    floorName: "Loom Gallery",
+    sectionId: 5,
+    title: "Double Weave",
+    subtitle: "CASE in a second CTE",
+    flavor:
+      "First CTE filters strong threads — the second labels each row with CASE before the shuttle reads the weave.",
+    objective:
+      "Return name, tension, and grade from WITH strong AS (tension >= 50) and graded AS (CASE A/B on strong), selecting from graded.",
+    skills: ["cte", "case"],
+    xp: 420,
+    tables: [
+      {
+        name: "threads",
+        description: "Gallery threads and tension",
+        columns: ["id", "name", "tension", "wing"],
+      },
+    ],
+    starterQuery: "WITH strong AS (\n  SELECT name, tension FROM threads\n",
+    hint: "Two CTEs: strong filters tension >= 50; graded adds CASE WHEN tension >= 60 THEN 'A' ELSE 'B'.",
+  },
+  {
+    id: 65,
+    slug: "gallery-join",
+    floor: 22,
+    floorName: "Loom Gallery",
+    sectionId: 5,
+    title: "Gallery Join",
+    subtitle: "DISTINCT in a CTE",
+    flavor:
+      "DISTINCT in WITH strips duplicate spool IDs — only unique weavers who hold a hot thread qualify.",
+    objective:
+      "Return weaver name from WITH hot AS (SELECT DISTINCT weaver_id WHERE tension > 30) joined to weavers.",
+    skills: ["cte", "distinct", "inner-join"],
+    xp: 430,
+    tables: [
+      {
+        name: "weavers",
+        description: "Gallery weavers",
+        columns: ["id", "name"],
+      },
+      {
+        name: "threads",
+        description: "Threads on the gallery spools",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery: "WITH hot AS (\n  SELECT DISTINCT weaver_id FROM threads\n",
+    hint: "DISTINCT weaver_id in WITH, JOIN weavers ON id.",
+  },
+  {
+    id: 66,
+    slug: "tangled-join",
+    floor: 22,
+    floorName: "Loom Gallery",
+    sectionId: 5,
+    title: "Tangled Join",
+    subtitle: "CTE + wing filter",
+    flavor:
+      "North-wing weavers only — name them in WITH, then join their threads in the gallery tangle.",
+    objective:
+      "Return weaver name and tension via WITH north AS (weavers where wing = 'North') joined to threads.",
+    skills: ["cte", "inner-join"],
+    xp: 440,
+    tables: [
+      {
+        name: "weavers",
+        description: "Weavers by gallery wing",
+        columns: ["id", "name", "wing"],
+      },
+      {
+        name: "threads",
+        description: "Threads per weaver",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery: "WITH north AS (\n  SELECT id, name FROM weavers\n",
+    hint: "WITH north AS (SELECT id, name WHERE wing = 'North'), JOIN threads.",
+  },
+  {
+    id: 67,
+    slug: "archive-totals",
+    floor: 23,
+    floorName: "Tangled Archives",
+    sectionId: 5,
+    title: "Archive Totals",
+    subtitle: "CTE + GROUP BY",
+    flavor:
+      "Roll every thread into a CTE, then sum tension per weaver — woven aggregates from a named step.",
+    objective:
+      "Return weaver name and total_tension from WITH roll AS (threads) joined and summed per weaver.",
+    skills: ["cte", "inner-join", "group-by"],
+    xp: 445,
+    tables: [
+      {
+        name: "weavers",
+        description: "Weavers in the archives",
+        columns: ["id", "name"],
+      },
+      {
+        name: "threads",
+        description: "Archived thread tensions",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery: "WITH roll AS (\n  SELECT weaver_id, tension FROM threads\n",
+    hint: "WITH roll AS (SELECT weaver_id, tension FROM threads), JOIN weavers, SUM tension GROUP BY name.",
+  },
+  {
+    id: 68,
+    slug: "corridor-whisper",
+    floor: 23,
+    floorName: "Tangled Archives",
+    sectionId: 5,
+    title: "Corridor Whisper",
+    subtitle: "Correlated EXISTS",
+    flavor:
+      "The corridor only admits weavers who hold a hot thread — EXISTS checks each weaver against their own spool.",
+    objective:
+      "Return weaver name where EXISTS a thread with weaver_id match and tension > 60.",
+    skills: ["exists", "subquery"],
+    xp: 455,
+    tables: [
+      {
+        name: "weavers",
+        description: "Weavers in the corridor",
+        columns: ["id", "name"],
+      },
+      {
+        name: "threads",
+        description: "Thread tensions by weaver",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery: "SELECT name\nFROM weavers\nWHERE EXISTS (\n",
+    hint: "EXISTS (SELECT 1 FROM threads WHERE weaver_id = weavers.id AND tension > 60).",
+  },
+  {
+    id: 69,
+    slug: "pattern-threshold",
+    floor: 23,
+    floorName: "Tangled Archives",
+    sectionId: 5,
+    title: "Pattern Threshold",
+    subtitle: "HAVING inside a CTE",
+    flavor:
+      "HAVING filters grouped rows inside WITH — totals above threshold never leave the named weave.",
+    objective:
+      "Return weaver_id and total from WITH sums AS (GROUP BY weaver_id HAVING SUM(tension) > 100).",
+    skills: ["cte", "group-by", "having"],
+    xp: 465,
+    tables: [
+      {
+        name: "threads",
+        description: "Threads for pattern totals",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery: "WITH sums AS (\n  SELECT weaver_id, SUM(tension) AS total\n  FROM threads\n  GROUP BY weaver_id\n",
+    hint: "HAVING SUM(tension) > 100 inside the CTE after GROUP BY.",
+  },
+  {
+    id: 70,
+    slug: "vault-derived",
+    floor: 24,
+    floorName: "Pattern Vault",
+    sectionId: 5,
+    title: "Vault Derived",
+    subtitle: "Subquery in FROM",
+    flavor:
+      "Average tension per weaver lives in a derived table — query the vault stats, then join names to the result.",
+    objective:
+      "Return weaver name and avg_tension from (SELECT weaver_id, AVG(tension) … GROUP BY) AS stats joined to weavers.",
+    skills: ["subquery", "inner-join", "avg", "group-by"],
+    xp: 470,
+    tables: [
+      {
+        name: "weavers",
+        description: "Weavers in the pattern vault",
+        columns: ["id", "name"],
+      },
+      {
+        name: "threads",
+        description: "Vault thread readings",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery:
+      "SELECT weavers.name, stats.avg_tension\nFROM (\n  SELECT weaver_id, AVG(tension) AS avg_tension\n",
+    hint: "Derived table in FROM with AVG + GROUP BY, JOIN weavers, ORDER BY name.",
+  },
+  {
+    id: 71,
+    slug: "mirror-weave",
+    floor: 24,
+    floorName: "Pattern Vault",
+    sectionId: 5,
+    title: "Mirror Weave",
+    subtitle: "CTE + LEFT JOIN",
+    flavor:
+      "Every weaver must appear in the mirror — even those with no threads. COALESCE fills blank spools with zero.",
+    objective:
+      "Return weaver name and max_tension from WITH loom AS (weavers) LEFT JOIN threads, COALESCE(MAX(tension), 0), grouped by name.",
+    skills: ["cte", "left-join", "coalesce", "group-by"],
+    xp: 480,
+    tables: [
+      {
+        name: "weavers",
+        description: "All vault weavers",
+        columns: ["id", "name"],
+      },
+      {
+        name: "threads",
+        description: "Optional thread assignments",
+        columns: ["id", "weaver_id", "tension"],
+      },
+    ],
+    starterQuery: "WITH loom AS (\n  SELECT id, name FROM weavers\n",
+    hint: "WITH loom AS (SELECT id, name FROM weavers), LEFT JOIN threads, MAX + COALESCE, GROUP BY name.",
+  },
+  {
+    id: 72,
+    slug: "fracture-standing",
+    floor: 24,
+    floorName: "Pattern Vault",
+    sectionId: 5,
+    title: "Fracture Standing",
+    subtitle: "Window on a CTE",
+    flavor:
+      "East-wing threads named in WITH, then ROW_NUMBER ranks the fracture — window functions on a woven step.",
+    objective:
+      "Return name and standing from WITH east AS (wing = 'East') with ROW_NUMBER() OVER (ORDER BY tension DESC), ordered by standing.",
+    skills: ["cte", "window", "order-by"],
+    xp: 490,
+    tables: [
+      {
+        name: "threads",
+        description: "East-wing threads for ranking",
+        columns: ["id", "name", "tension", "wing"],
+      },
+    ],
+    starterQuery: "WITH east AS (\n  SELECT name, tension FROM threads\n",
+    hint: "WITH east AS (WHERE wing = 'East'), ROW_NUMBER OVER tension DESC, ORDER BY standing.",
+  },
+  {
+    id: 73,
+    slug: "weaver-prelude",
+    floor: 25,
+    floorName: "Weaver's Seal",
+    sectionId: 5,
+    title: "Weaver Prelude",
+    subtitle: "CTE + COALESCE + IN",
+    flavor:
+      "Warmup for the Weaver: north and east wings only, blank titles read 'Apprentice' on the seal slate.",
+    objective:
+      "Return name and COALESCE(title, 'Apprentice') as title from WITH picked AS (wing IN ('North', 'East')).",
+    skills: ["cte", "coalesce", "in"],
+    xp: 495,
+    tables: [
+      {
+        name: "weavers",
+        description: "Candidates at the weaver's seal",
+        columns: ["id", "name", "title", "wing"],
+      },
+    ],
+    starterQuery: "WITH picked AS (\n  SELECT name, title FROM weavers\n",
+    hint: "WITH picked AS (WHERE wing IN ('North', 'East')), COALESCE title, ORDER BY name.",
+  },
+  {
+    id: 74,
+    slug: "loom-weaver",
+    floor: 25,
+    floorName: "Weaver's Seal",
+    sectionId: 5,
+    title: "Loom Weaver",
+    subtitle: "Close the Fractured Loom",
+    flavor:
+      "Final weave: active weavers who logged a shift, totals in WITH, rank by woven tension — every prior thread pulled tight.",
+    objective:
+      "Return weaver name, total, and RANK() OVER (ORDER BY total DESC) as standing for active weavers with EXISTS in shifts and totals from WITH, ordered by standing.",
+    skills: ["boss", "cte", "window", "exists", "inner-join", "group-by", "order-by"],
+    xp: 520,
+    isBoss: true,
+    isSectionBoss: true,
+    tables: [
+      {
+        name: "weavers",
+        description: "Active weavers at the seal",
+        columns: ["id", "name", "active"],
+      },
+      {
+        name: "threads",
+        description: "Thread tensions per weaver",
+        columns: ["id", "weaver_id", "tension"],
+      },
+      {
+        name: "shifts",
+        description: "Logged loom shifts",
+        columns: ["id", "weaver_id", "shift_on"],
+      },
+    ],
+    starterQuery:
+      "WITH totals AS (\n  SELECT weaver_id, SUM(tension) AS total\n  FROM threads\n  GROUP BY weaver_id\n)\nSELECT weavers.name, totals.total,\n",
+    hint: "WITH totals, JOIN weavers + totals, EXISTS shifts, active = 1, RANK() on total, ORDER BY standing.",
+  },
 ];
 
 export const FLOOR_LABELS: Record<number, string> = {
@@ -1248,4 +2022,19 @@ export const FLOOR_LABELS: Record<number, string> = {
   13: "Floor XIII — Window Gallery",
   14: "Floor XIV — Structure Vault",
   15: "Floor XV — Apex Seal",
+  16: "Floor XVI — Hollow Nave",
+  17: "Floor XVII — Absence Choir",
+  18: "Floor XVIII — Integrity Crypt",
+  19: "Floor XIX — Fractured Transept",
+  20: "Floor XX — Cardinal Void",
+  21: "Floor XXI — Warp Hall",
+  22: "Floor XXII — Loom Gallery",
+  23: "Floor XXIII — Tangled Archives",
+  24: "Floor XXIV — Pattern Vault",
+  25: "Floor XXV — Weaver's Seal",
+  26: "Floor XXVI — Throne Approach",
+  27: "Floor XXVII — Velvet Gallery",
+  28: "Floor XXVIII — Sovereign Query",
+  29: "Floor XXIX — Crown Vault",
+  30: "Floor XXX — Query Throne",
 };

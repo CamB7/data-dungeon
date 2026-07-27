@@ -9,18 +9,24 @@ export function HomeNav() {
   const signedIn = !isPending && !!session?.user;
 
   return (
-    <nav className="flex flex-wrap items-center justify-end gap-4 text-sm text-stone-300">
-      <a href="#problem" className="transition hover:text-torch">
+    <nav className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-stone-300">
+      <a
+        href="#problem"
+        className="inline-flex min-h-11 items-center px-1 transition hover:text-torch sm:min-h-0 sm:px-0"
+      >
         Why
       </a>
-      <a href="#demo" className="transition hover:text-torch">
-        Demo
-      </a>
-      <Link href="/feedback" className="transition hover:text-torch">
+      <Link
+        href="/feedback"
+        className="inline-flex min-h-11 items-center px-1 transition hover:text-torch sm:min-h-0 sm:px-0"
+      >
         Feedback
       </Link>
       {signedIn ? (
-        <Link href="/dungeon" className="transition hover:text-torch">
+        <Link
+          href="/dungeon"
+          className="inline-flex min-h-11 items-center px-1 transition hover:text-torch sm:min-h-0 sm:px-0"
+        >
           Dungeon
         </Link>
       ) : null}

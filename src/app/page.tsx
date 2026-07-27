@@ -34,8 +34,8 @@ export default function Home() {
                 Learn SQL by clearing chambers — not copying answers.
               </h1>
               <p className="animate-fade-up-delay-2 mt-5 max-w-lg text-lg font-light leading-relaxed text-stone-300">
-                Write real queries, climb three live sections, and get an AI Warden
-                to seal every clear before it counts.
+                Write real queries, climb six live sections (74 chambers), and get an AI
+                Warden to seal every clear before it counts.
               </p>
               <HomeHeroCtas />
             </div>

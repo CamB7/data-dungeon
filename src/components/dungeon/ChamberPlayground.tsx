@@ -64,6 +64,9 @@ export function ChamberPlayground({ chamber, filename }: ChamberPlaygroundProps)
       });
       const data = (await res.json()) as RunResponse;
       setOutcome(data);
+      if (!res.ok && data.error) {
+        setOutcome({ ok: false, error: data.error });
+      }
 
       if (data.ok && data.passed === false) {
         await recordLocalAndSync({

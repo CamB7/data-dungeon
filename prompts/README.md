@@ -6,7 +6,7 @@ These files are the product’s AI brain. They are **not** buried in TypeScript 
 
 Chamber progress in Neon **only** updates after `/api/dungeon/claim` succeeds. That route:
 
-1. Verifies the adventurer’s SQL against the chamber (or weekly raid).
+1. Verifies the adventurer’s SQL against the chamber.
 2. Calls Gemini with [`warden-seal.md`](./warden-seal.md) to mint a short **loot seal**.
 3. Persists the clear **only if** a non-empty seal is returned (`warden_seal` on `chamber_completions`).
 
@@ -22,15 +22,13 @@ Related code: `src/app/api/dungeon/claim/route.ts`, `src/lib/progress-server.ts`
 | `warden-coach.md` | `/api/warden` | Live coaching / fail review chat |
 | `warden-explain.md` | `/api/dungeon/explain` (`mode=explain`) | Plain-language result narration |
 | `warden-recap.md` | `/api/dungeon/explain` (`mode=recap`) | Post-clear skill recap |
-| `quest-start.md` | `/api/dungeon/quest-start` | Natural-language → chamber |
-| `recommend.md` | `/api/dungeon/recommend` | Adaptive next-chamber pick |
-| `weekly-raid.md` | `/api/dungeon/raid` | Generate weekly SQLite chamber |
+| `chart-overview.md` | `/api/dungeon/chart` | Progress chart Warden overview (falls back to deterministic text if AI fails) |
 
 ## Design principles
 
 - **Socratic first** — coach toward the skill; never dump the full solution unless the chamber is already cleared and the user asks for a post-clear explanation.
 - **Schema-bound** — never invent tables/columns outside the chamber context injected by the server.
 - **Short, dungeon-light voice** — atmosphere without purple prose.
-- **Deterministic where it matters** — raid `solutionSql` must be ordered; seals must name the proven skill.
+- **Deterministic where it matters** — seals must name the proven skill.
 
 Runtime loader: `src/lib/ai/load-prompt.ts` (`loadPrompt("warden-seal")`).

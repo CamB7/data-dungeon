@@ -21,7 +21,7 @@ export const users = pgTable("users", {
   xp: integer("xp").notNull().default(0),
   /** Adventurer rank (1 + chambers cleared). */
   level: integer("level").notNull().default(1),
-  /** Skill miss counts for adaptive recommendations. */
+  /** Skill miss counts from failed attempts (chart drill list). */
   weakSkills: jsonb("weak_skills")
     .$type<Record<string, number>>()
     .notNull()

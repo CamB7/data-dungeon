@@ -33,12 +33,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unknown chamber." }, { status: 404 });
   }
 
-  const outcome = await runChamberQuery(slug, sql);
-  return NextResponse.json({
-    ok: outcome.ok,
-    error: outcome.error,
-    result: outcome.result,
-    passed: outcome.passed,
-    message: outcome.message,
-  });
+  try {
+    const outcome = await runChamberQuery(slug, sql);
+    return NextResponse.json({
+      ok: outcome.ok,
+      error: outcome.error,
+      result: outcome.result,
+      passed: outcome.passed,
+      message: outcome.message,
+    });
+  } catch (err) {
+    console.error("[/api/dungeon/run]", err);
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          err instanceof Error
+            ? err.message
+            : "The SQL sandbox failed to start. Try again in a moment.",
+      },
+      { status: 500 },
+    );
+  }
 }

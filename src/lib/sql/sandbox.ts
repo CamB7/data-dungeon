@@ -21,13 +21,45 @@ export type RunOutcome = {
 
 let sqlPromise: Promise<Awaited<ReturnType<typeof initSqlJs>>> | null = null;
 
+function wasmCandidates(): string[] {
+  const roots = [
+    process.cwd(),
+    path.join(process.cwd(), ".next/server"),
+  ];
+  const relative = path.join("node_modules", "sql.js", "dist", "sql-wasm.wasm");
+  const candidates = roots.map((root) => path.join(root, relative));
+
+  try {
+    const pkgRoot = path.dirname(
+      require.resolve("sql.js/package.json"),
+    );
+    candidates.push(path.join(pkgRoot, "dist", "sql-wasm.wasm"));
+  } catch {
+    // package.json resolve can fail in some bundles
+  }
+
+  return candidates;
+}
+
+async function loadWasmBinary(): Promise<ArrayBuffer> {
+  for (const wasmPath of wasmCandidates()) {
+    try {
+      if (fs.existsSync(wasmPath)) {
+        return fs.readFileSync(wasmPath).buffer as ArrayBuffer;
+      }
+    } catch {
+      // try next candidate
+    }
+  }
+
+  throw new Error(
+    "sql.js WASM binary missing from the server bundle. Ensure next.config includes node_modules/sql.js/dist/sql-wasm.wasm in outputFileTracingIncludes.",
+  );
+}
+
 async function getSql() {
   if (!sqlPromise) {
-    const wasmPath = path.join(
-      process.cwd(),
-      "node_modules/sql.js/dist/sql-wasm.wasm",
-    );
-    const wasmBinary = fs.readFileSync(wasmPath).buffer as ArrayBuffer;
+    const wasmBinary = await loadWasmBinary();
     sqlPromise = initSqlJs({ wasmBinary });
   }
   return sqlPromise;

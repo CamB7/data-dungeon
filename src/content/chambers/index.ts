@@ -127,6 +127,7 @@ export const SKILL_LABELS: Record<Chamber["skills"][number], string> = {
   subquery: "Subquery",
   nulls: "NULL",
   union: "UNION",
+  "union-all": "UNION ALL",
   exists: "EXISTS",
   like: "LIKE",
   between: "BETWEEN",
@@ -138,5 +139,6 @@ export const SKILL_LABELS: Record<Chamber["skills"][number], string> = {
   cast: "CAST",
   window: "Window",
   round: "ROUND",
+  cte: "WITH",
   boss: "Boss",
 };

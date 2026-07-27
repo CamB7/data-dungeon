@@ -1,7 +1,9 @@
 import type { IconType } from "react-icons";
 import {
+  GiChurch,
   GiKeyLock,
   GiLockedChest,
+  GiSpinningWheel,
   GiStoneTower,
   GiThroneKing,
   GiTrident,
@@ -14,14 +16,17 @@ const BOSS_ICONS: Record<string, IconType> = {
   "lockward-seal-boss": GiKeyLock,
   "salt-sovereign-boss": GiTrident,
   "index-archon": GiStoneTower,
+  "null-cardinal": GiChurch,
+  "loom-weaver": GiSpinningWheel,
 };
 
 const toneByTheme: Record<SectionThemeId, string> = {
   lockward: "text-blood animate-ember-flicker",
-  salt: "text-brine animate-brine-flicker",
-  spire: "text-spire animate-torch-pulse",
-  hollow: "text-hollow animate-ember-flicker",
-  throne: "text-throne animate-ember-flicker",
+  salt: "text-brine-glow animate-brine-flicker",
+  spire: "text-meridian-glow animate-torch-pulse",
+  hollow: "text-void-glow animate-ember-flicker",
+  loom: "text-copper-glow animate-ember-flicker",
+  throne: "text-velvet-glow animate-ember-flicker",
 };
 
 type BossEmblemProps = {

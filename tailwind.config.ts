@@ -5,6 +5,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -34,50 +35,132 @@ const config: Config = {
           deep: "#3a3230",
         },
         /**
-         * Salt Crypts — high-contrast ice cyan (distinct from Lockward).
-         * Tuned for dark backgrounds: bright accents, readable secondary text.
+         * Index Spire secondary — malachite index ink (cool jade, not cyan/copper).
+         */
+        meridian: {
+          DEFAULT: "#3AA898",
+          soft: "#2A8878",
+          dim: "#1A5850",
+          glow: "#58D8C0",
+        },
+        /**
+         * Null Cathedral secondary — deep amethyst void.
+         */
+        void: {
+          DEFAULT: "#5E4880",
+          soft: "#453566",
+          dim: "#2D2340",
+          glow: "#8B6FC4",
+        },
+        /**
+         * Query Throne secondary — royal crimson.
+         */
+        velvet: {
+          DEFAULT: "#9B2848",
+          soft: "#6B1830",
+          dim: "#4A1020",
+          glow: "#D44060",
+        },
+        /**
+         * Salt Crypts — brine cyan + salt ice (two-tone, like moss + torch).
          */
         brine: {
-          DEFAULT: "#7DF0FF",
+          DEFAULT: "#5ED4F0",
           soft: "#38BDF8",
           deep: "#0B3A4A",
-          glow: "#CFFAFE",
+          glow: "#A8F0FC",
+          muted: "#8EC4D8",
         },
         salt: {
-          DEFAULT: "#E8FAFC",
-          dim: "#9ED8E3",
+          DEFAULT: "#D4F1F5",
+          dim: "#7EC8D8",
           deep: "#102832",
+          muted: "#A8D0DC",
         },
         abyss: {
           DEFAULT: "#050C12",
           soft: "#0A1820",
         },
         /**
-         * Index Spire — cool tower silver / slate (not purple).
+         * Index Spire — cool moonstone quartz tower + jade meridian lines.
          */
         spire: {
-          DEFAULT: "#B8C5D6",
-          soft: "#7A8FA8",
-          deep: "#0E141C",
-          glow: "#E8EEF5",
+          DEFAULT: "#A8B8CC",
+          soft: "#7088A4",
+          deep: "#080C14",
+          glow: "#D8E8F4",
         },
         /**
-         * Null Cathedral — bone on hollow void.
+         * Null Cathedral borders — red-grey trim.
+         */
+        redgrey: {
+          DEFAULT: "#8A6565",
+          soft: "#6E5050",
+          dim: "#503838",
+          glow: "#A87878",
+        },
+        /**
+         * Null Cathedral — crypt iron stone (warm, not pastel).
          */
         hollow: {
-          DEFAULT: "#D4D0C8",
-          soft: "#9A958C",
+          DEFAULT: "#7A7268",
+          soft: "#524D46",
           deep: "#0C0B0A",
-          glow: "#F2EFE8",
+          glow: "#A89478",
         },
         /**
-         * Query Throne — regal amber / ember gold.
+         * Fractured Loom borders — crimson thread trim.
+         */
+        crimsontrim: {
+          DEFAULT: "#B84848",
+          soft: "#943838",
+          dim: "#6A2828",
+          glow: "#D86868",
+        },
+        /**
+         * Fractured Loom — scarlet weave stone.
+         */
+        scarlet: {
+          DEFAULT: "#C45050",
+          soft: "#984040",
+          deep: "#321E1E",
+          glow: "#E86868",
+        },
+        /**
+         * Fractured Loom secondary — warm copper thread (contrast with scarlet stone).
+         */
+        copper: {
+          DEFAULT: "#D48858",
+          soft: "#B86840",
+          dim: "#8A4C28",
+          glow: "#F0A870",
+        },
+        /**
+         * @deprecated Loom UI uses copper — kept for reference.
+         */
+        garnet: {
+          DEFAULT: "#8A3048",
+          soft: "#6A2438",
+          dim: "#4A1828",
+          glow: "#B84860",
+        },
+        /**
+         * Query Throne borders — yellow trim.
+         */
+        goldline: {
+          DEFAULT: "#E8C830",
+          soft: "#C9A820",
+          dim: "#9A7B18",
+          glow: "#F5D850",
+        },
+        /**
+         * Query Throne — burnished regal gold.
          */
         throne: {
-          DEFAULT: "#F0C14A",
-          soft: "#C4922E",
+          DEFAULT: "#C9921A",
+          soft: "#8A6410",
           deep: "#140F08",
-          glow: "#FFE9A8",
+          glow: "#E8B030",
         },
         stone: {
           950: "#070a09",
@@ -99,36 +182,43 @@ const config: Config = {
         "boss-dungeon":
           "linear-gradient(180deg, rgba(40, 12, 14, 0.45), transparent 42%), linear-gradient(135deg, rgba(80, 20, 20, 0.22), transparent 50%), linear-gradient(180deg, rgba(8,6,10,0.15), rgba(4,2,6,0.88))",
         "salt-dungeon":
-          "radial-gradient(ellipse 85% 55% at 50% 0%, rgba(56, 189, 248, 0.22), transparent 55%), radial-gradient(ellipse 50% 45% at 90% 70%, rgba(14, 90, 110, 0.4), transparent 50%), radial-gradient(ellipse 40% 35% at 8% 85%, rgba(125, 240, 255, 0.1), transparent 45%), linear-gradient(180deg, rgba(5,12,18,0.1), rgba(5,12,18,0.7))",
+          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(94, 212, 240, 0.18), transparent 55%), radial-gradient(ellipse 45% 40% at 92% 75%, rgba(126, 200, 216, 0.1), transparent 50%), radial-gradient(ellipse 35% 30% at 8% 80%, rgba(56, 189, 248, 0.08), transparent 45%), linear-gradient(180deg, rgba(5,12,18,0.15), rgba(5,12,18,0.82))",
         "salt-boss-dungeon":
-          "linear-gradient(180deg, rgba(20, 70, 90, 0.38), transparent 42%), linear-gradient(150deg, rgba(8, 50, 70, 0.28), transparent 55%), linear-gradient(180deg, rgba(2,8,14,0.2), rgba(1,4,8,0.94))",
+          "linear-gradient(180deg, rgba(94, 212, 240, 0.22), transparent 42%), linear-gradient(150deg, rgba(8, 50, 70, 0.28), transparent 55%), linear-gradient(180deg, rgba(2,8,14,0.25), rgba(1,4,8,0.94))",
         "spire-dungeon":
-          "linear-gradient(180deg, rgba(122, 143, 168, 0.22), transparent 45%), linear-gradient(160deg, rgba(30, 45, 65, 0.4), transparent 55%), linear-gradient(180deg, rgba(14,20,28,0.2), rgba(8,12,18,0.85))",
+          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(58, 168, 152, 0.14), transparent 55%), radial-gradient(ellipse 45% 40% at 88% 72%, rgba(168, 184, 204, 0.12), transparent 50%), radial-gradient(ellipse 35% 30% at 10% 78%, rgba(42, 136, 120, 0.1), transparent 45%), linear-gradient(180deg, rgba(8,12,20,0.2), rgba(4,6,10,0.92))",
         "spire-boss-dungeon":
-          "linear-gradient(180deg, rgba(184, 197, 214, 0.2), transparent 40%), linear-gradient(140deg, rgba(40, 55, 80, 0.45), transparent 55%), linear-gradient(180deg, rgba(8,12,20,0.3), rgba(4,6,10,0.92))",
+          "linear-gradient(180deg, rgba(88, 216, 192, 0.18), transparent 40%), linear-gradient(140deg, rgba(26, 88, 80, 0.35), transparent 55%), linear-gradient(180deg, rgba(6,8,12,0.3), rgba(3,4,6,0.94))",
         "hollow-dungeon":
-          "linear-gradient(180deg, rgba(212, 208, 200, 0.12), transparent 42%), linear-gradient(200deg, rgba(40, 38, 34, 0.5), transparent 55%), linear-gradient(180deg, rgba(12,11,10,0.2), rgba(6,5,4,0.9))",
+          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(94, 72, 128, 0.2), transparent 55%), radial-gradient(ellipse 45% 40% at 85% 75%, rgba(122, 114, 104, 0.14), transparent 50%), radial-gradient(ellipse 35% 30% at 12% 72%, rgba(69, 53, 102, 0.12), transparent 45%), linear-gradient(180deg, rgba(12,11,10,0.2), rgba(6,5,4,0.92))",
         "hollow-boss-dungeon":
-          "linear-gradient(180deg, rgba(212, 208, 200, 0.18), transparent 38%), linear-gradient(160deg, rgba(50, 20, 20, 0.25), transparent 50%), linear-gradient(180deg, rgba(8,7,6,0.25), rgba(3,2,2,0.95))",
+          "linear-gradient(180deg, rgba(139, 111, 196, 0.2), transparent 38%), linear-gradient(160deg, rgba(45, 35, 64, 0.45), transparent 50%), linear-gradient(180deg, rgba(8,7,6,0.25), rgba(3,2,2,0.96))",
+        "loom-dungeon":
+          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(220, 100, 100, 0.26), transparent 55%), radial-gradient(ellipse 45% 40% at 88% 72%, rgba(200, 120, 80, 0.18), transparent 50%), radial-gradient(ellipse 35% 30% at 10% 78%, rgba(196, 88, 88, 0.14), transparent 45%), linear-gradient(180deg, rgba(28, 16, 16, 0.18), rgba(20, 12, 12, 0.78))",
+        "loom-boss-dungeon":
+          "linear-gradient(180deg, rgba(232, 120, 100, 0.22), transparent 38%), linear-gradient(150deg, rgba(180, 100, 64, 0.22), transparent 50%), linear-gradient(180deg, rgba(20, 10, 10, 0.22), rgba(14, 8, 8, 0.86))",
         "throne-dungeon":
-          "linear-gradient(180deg, rgba(240, 193, 74, 0.18), transparent 42%), linear-gradient(150deg, rgba(100, 60, 20, 0.35), transparent 55%), linear-gradient(180deg, rgba(20,15,8,0.2), rgba(10,8,4,0.9))",
+          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(155, 40, 72, 0.18), transparent 55%), radial-gradient(ellipse 45% 40% at 88% 72%, rgba(201, 146, 26, 0.16), transparent 50%), radial-gradient(ellipse 35% 30% at 10% 78%, rgba(138, 100, 16, 0.12), transparent 45%), linear-gradient(180deg, rgba(20,15,8,0.2), rgba(10,8,4,0.92))",
         "throne-boss-dungeon":
-          "linear-gradient(180deg, rgba(240, 193, 74, 0.28), transparent 40%), linear-gradient(135deg, rgba(120, 40, 30, 0.35), transparent 50%), linear-gradient(180deg, rgba(16,10,4,0.3), rgba(6,4,2,0.95))",
+          "linear-gradient(180deg, rgba(232, 176, 48, 0.22), transparent 40%), linear-gradient(135deg, rgba(107, 24, 48, 0.35), transparent 50%), linear-gradient(180deg, rgba(16,10,4,0.3), rgba(6,4,2,0.96))",
         grid: "linear-gradient(rgba(155, 176, 166, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(155, 176, 166, 0.04) 1px, transparent 1px)",
         "salt-grid":
-          "linear-gradient(rgba(125, 240, 255, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(125, 240, 255, 0.07) 1px, transparent 1px)",
+          "linear-gradient(rgba(94, 212, 240, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(94, 212, 240, 0.06) 1px, transparent 1px)",
         "spire-grid":
-          "linear-gradient(rgba(184, 197, 214, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(184, 197, 214, 0.06) 1px, transparent 1px)",
+          "linear-gradient(rgba(58, 168, 152, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(58, 168, 152, 0.06) 1px, transparent 1px)",
         "hollow-grid":
-          "linear-gradient(rgba(212, 208, 200, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(212, 208, 200, 0.05) 1px, transparent 1px)",
+          "linear-gradient(rgba(122, 114, 104, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(122, 114, 104, 0.06) 1px, transparent 1px)",
+        "loom-grid":
+          "linear-gradient(rgba(212, 136, 88, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(212, 136, 88, 0.08) 1px, transparent 1px)",
         "throne-grid":
-          "linear-gradient(rgba(240, 193, 74, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(240, 193, 74, 0.06) 1px, transparent 1px)",
+          "linear-gradient(rgba(201, 146, 26, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(201, 146, 26, 0.06) 1px, transparent 1px)",
       },
       backgroundSize: {
         grid: "48px 48px",
         "salt-grid": "40px 40px",
         "spire-grid": "44px 44px",
         "hollow-grid": "52px 52px",
+        "loom-grid": "48px 48px",
         "throne-grid": "46px 46px",
       },
       keyframes: {

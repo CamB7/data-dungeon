@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getChamberBySlug } from "@/content/chambers";
 import { getChamberSeed } from "@/content/chambers/seeds";
-import { loadCurrentWeeklyRaid } from "@/lib/raid-store";
-import { runRaidQuery } from "@/lib/sql/raid";
 import { runChamberQuery } from "@/lib/sql/sandbox";
 
 export const runtime = "nodejs";
@@ -31,34 +29,16 @@ export async function POST(request: Request) {
     );
   }
 
-  if (slug === "weekly-raid") {
-    const raid = loadCurrentWeeklyRaid();
-    if (!raid) {
-      return NextResponse.json(
-        { error: "No raid this week. Generate one first." },
-        { status: 404 },
-      );
-    }
-    const outcome = await runRaidQuery(raid.seedSql, raid.solutionSql, sql);
-    return NextResponse.json({
-      ok: outcome.ok,
-      error: outcome.error,
-      result: outcome.result,
-      passed: outcome.passed,
-      message: outcome.message,
-    });
+  if (!getChamberBySlug(slug) || !getChamberSeed(slug)) {
+    return NextResponse.json({ error: "Unknown chamber." }, { status: 404 });
   }
 
-  if (getChamberBySlug(slug) && getChamberSeed(slug)) {
-    const outcome = await runChamberQuery(slug, sql);
-    return NextResponse.json({
-      ok: outcome.ok,
-      error: outcome.error,
-      result: outcome.result,
-      passed: outcome.passed,
-      message: outcome.message,
-    });
-  }
-
-  return NextResponse.json({ error: "Unknown chamber." }, { status: 404 });
+  const outcome = await runChamberQuery(slug, sql);
+  return NextResponse.json({
+    ok: outcome.ok,
+    error: outcome.error,
+    result: outcome.result,
+    passed: outcome.passed,
+    message: outcome.message,
+  });
 }

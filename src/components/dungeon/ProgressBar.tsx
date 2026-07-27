@@ -1,4 +1,5 @@
 import type { ChamberStatus } from "@/content/chambers";
+import { sectionChrome, type SectionThemeId } from "@/lib/theme";
 
 type ProgressBarProps = {
   level: number;
@@ -59,41 +60,15 @@ export function ChamberStatusBanner({
 }: {
   status: ChamberStatus;
   salt?: boolean;
-  theme?: "lockward" | "salt" | "spire" | "hollow" | "throne";
+  theme?: SectionThemeId;
 }) {
-  const accent =
-    theme === "salt"
-      ? {
-          locked: "border-brine/25 bg-abyss-soft text-salt-dim",
-          lockedLabel: "text-brine-soft",
-          current: "border-brine/50 bg-brine/15 text-brine",
-          currentBody: "text-salt",
-          cleared: "border-brine/30 bg-brine/10",
-          clearedLabel: "text-brine",
-        }
-      : theme === "spire"
-        ? {
-            locked: "border-spire/25 bg-spire-deep/80 text-spire-soft",
-            lockedLabel: "text-spire-soft",
-            current: "border-spire/50 bg-spire/15 text-spire",
-            currentBody: "text-spire-soft",
-            cleared: "border-spire/30 bg-spire/10",
-            clearedLabel: "text-spire",
-          }
-        : {
-            locked: "border-stone-600/50 bg-stone-900/80 text-stone-400",
-            lockedLabel: "text-stone-500",
-            current: "border-moss/40 bg-moss/10 text-moss",
-            currentBody: "text-moss/90",
-            cleared: "border-moss/30 bg-moss/5",
-            clearedLabel: "text-moss",
-          };
+  const accent = sectionChrome(theme);
 
   if (status === "locked") {
     return (
-      <div className={`rounded-xl border px-4 py-3 text-sm ${accent.locked}`}>
+      <div className={`rounded-xl border px-4 py-3 text-sm ${accent.statusLocked}`}>
         <span
-          className={`font-mono text-xs tracking-wider uppercase ${accent.lockedLabel}`}
+          className={`font-mono text-xs tracking-wider uppercase ${accent.statusLockedLabel}`}
         >
           Locked
         </span>
@@ -106,9 +81,9 @@ export function ChamberStatusBanner({
 
   if (status === "current") {
     return (
-      <div className={`rounded-xl border px-4 py-3 text-sm ${accent.current}`}>
+      <div className={`rounded-xl border px-4 py-3 text-sm ${accent.statusCurrent}`}>
         <span className="font-mono text-xs tracking-wider uppercase">Your quest</span>
-        <p className={`mt-1 ${accent.currentBody}`}>
+        <p className={`mt-1 ${accent.statusCurrentBody}`}>
           Write a query that matches the objective. Fail? Ask the Warden for a targeted hint.
         </p>
       </div>
@@ -118,10 +93,10 @@ export function ChamberStatusBanner({
   if (status === "cleared") {
     return (
       <div
-        className={`rounded-xl border px-4 py-3 text-sm text-stone-300 ${accent.cleared}`}
+        className={`rounded-xl border px-4 py-3 text-sm text-stone-300 ${accent.statusCleared}`}
       >
         <span
-          className={`font-mono text-xs tracking-wider uppercase ${accent.clearedLabel}`}
+          className={`font-mono text-xs tracking-wider uppercase ${accent.statusClearedLabel}`}
         >
           Cleared
         </span>

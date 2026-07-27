@@ -144,8 +144,7 @@ export async function recordDbClearWithSeal(input: {
   }
 
   const chamber = getChamberBySlug(input.slug);
-  const xpAwarded =
-    input.slug === "weekly-raid" ? input.xp : (chamber?.xp ?? input.xp);
+  const xpAwarded = chamber?.xp ?? input.xp;
 
   await db.insert(chamberCompletions).values({
     userId: input.userId,
@@ -156,7 +155,7 @@ export async function recordDbClearWithSeal(input: {
 
   const cleared = [...current.cleared, input.slug];
   const xp = current.xp + xpAwarded;
-  const trackCleared = cleared.filter((s) => s !== "weekly-raid").length;
+  const trackCleared = cleared.length;
   const level = Math.max(1, trackCleared + 1);
 
   await db

@@ -87,7 +87,7 @@ export function SqlTypewriter({
         </span>
       </div>
       <pre
-        className="min-h-[16rem] whitespace-pre-wrap p-5 font-mono text-[13px] leading-6 text-moss/90 sm:min-h-[18rem] sm:text-sm"
+        className="min-h-[12rem] whitespace-pre-wrap p-4 font-mono text-sm leading-6 text-moss/90 sm:min-h-[18rem] sm:p-5 sm:text-sm"
         aria-label="Sample SQL query typing"
       >
         {shown}

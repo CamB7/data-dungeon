@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { DUNGEON_TRACK, getTotalTrackXp } from "@/content/chambers";
-import { AdaptiveRecommend } from "@/components/dungeon/AdaptiveRecommend";
 import { DungeonShell } from "@/components/dungeon/DungeonShell";
-import { QuestStart } from "@/components/dungeon/QuestStart";
 import { SectionHub } from "@/components/dungeon/SectionHub";
 import { TrackProgressHeader } from "@/components/dungeon/TrackProgressHeader";
-import { WeeklyRaidCard } from "@/components/dungeon/WeeklyRaidCard";
 
 export const metadata: Metadata = {
   title: "Dungeon Sections — Data Dungeon",
@@ -34,12 +32,21 @@ export default function DungeonHubPage() {
         <TrackProgressHeader />
       </div>
 
-      <div className="mb-12 space-y-6">
-        <QuestStart />
-        <div className="grid gap-6 lg:grid-cols-2">
-          <AdaptiveRecommend />
-          <WeeklyRaidCard />
-        </div>
+      <div className="mb-12">
+        <Link
+          href="/dungeon/chart"
+          className="block rounded-2xl border border-moss/25 bg-stone-950/60 p-5 transition hover:border-moss/40 hover:bg-moss/5"
+        >
+          <p className="font-mono text-xs tracking-[0.25em] text-torch uppercase">
+            Charted progression
+          </p>
+          <p className="mt-2 font-display text-lg font-bold text-foreground">
+            See how you&apos;re improving →
+          </p>
+          <p className="mt-1 text-sm text-stone-400">
+            Clear times, concepts learned, mastery bars, and a Warden overview.
+          </p>
+        </Link>
       </div>
 
       <SectionHub />

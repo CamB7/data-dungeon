@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       ? String((body as { slug: unknown }).slug)
       : "";
   const chamber = getChamberBySlug(slug);
-  if (!chamber && slug !== "weekly-raid") {
+  if (!chamber) {
     return new Response("Unknown chamber.", { status: 404 });
   }
 
@@ -66,13 +66,8 @@ export async function POST(request: Request) {
         }).failContext
       : undefined;
 
-  let system = wardenCoachSystem();
-  if (chamber) {
-    system += `\n\n${chamberContextBlock(chamber)}`;
-  } else {
-    system +=
-      "\n\nThis is the weekly AI-generated raid. Use any schema details the user provides.";
-  }
+  let system =
+    wardenCoachSystem() + `\n\n${chamberContextBlock(chamber)}`;
 
   if (failContext?.sql) {
     system += `\n\nLatest failed attempt SQL:\n${failContext.sql}`;

@@ -24,12 +24,6 @@ export function HomeHeroCtas() {
           Sign up free
         </Link>
       )}
-      <a
-        href="#demo"
-        className="inline-flex items-center justify-center rounded-full border border-stone-500/50 px-7 py-3.5 text-sm font-medium text-stone-300 transition hover:border-torch/60 hover:text-torch"
-      >
-        Watch demo
-      </a>
     </div>
   );
 }

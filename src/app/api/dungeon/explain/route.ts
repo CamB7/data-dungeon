@@ -28,6 +28,9 @@ export async function POST(request: Request) {
       ? String((body as { slug: unknown }).slug)
       : "";
   const chamber = getChamberBySlug(slug);
+  if (!chamber) {
+    return NextResponse.json({ error: "Unknown chamber." }, { status: 404 });
+  }
 
   const result =
     body && typeof body === "object" && "result" in body
@@ -42,9 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "result required." }, { status: 400 });
   }
 
-  const context = chamber
-    ? chamberContextBlock(chamber)
-    : "Weekly raid chamber (schema may vary).";
+  const context = chamberContextBlock(chamber);
 
   const isRecap = mode === "recap";
   const system = loadPrompt(isRecap ? "warden-recap" : "warden-explain");

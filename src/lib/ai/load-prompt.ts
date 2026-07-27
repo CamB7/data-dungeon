@@ -8,9 +8,7 @@ export type PromptName =
   | "warden-seal"
   | "warden-explain"
   | "warden-recap"
-  | "quest-start"
-  | "recommend"
-  | "weekly-raid";
+  | "chart-overview";
 
 /**
  * Load a system prompt from /prompts/*.md (visible in the repo, not baked into code).

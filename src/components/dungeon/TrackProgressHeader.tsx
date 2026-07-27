@@ -6,7 +6,7 @@ import { ProgressBar } from "./ProgressBar";
 
 export function TrackProgressHeader() {
   const { progress, authenticated, loading } = usePlayerProgress();
-  const trackCleared = progress.cleared.filter((s) => s !== "weekly-raid").length;
+  const trackCleared = progress.cleared.length;
   const level = Math.max(1, trackCleared + 1);
   const xpToNext = 100;
   const xpIntoLevel = progress.xp % xpToNext;

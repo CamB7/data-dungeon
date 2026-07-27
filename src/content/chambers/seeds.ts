@@ -1155,6 +1155,787 @@ export const CHAMBER_SEEDS: Record<string, ChamberSeed> = {
       ORDER BY place;
     `,
   },
+  "void-register": {
+    seedSql: `
+      CREATE TABLE saints (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        epitaph TEXT
+      );
+      INSERT INTO saints (id, name, epitaph) VALUES
+        (1, 'Aldric Void', 'Keeper of the nave'),
+        (2, 'Beryl Null', NULL),
+        (3, 'Cyrus Hollow', 'Silent witness'),
+        (4, 'Dara Blank', NULL);
+    `,
+    solutionSql: `
+      SELECT name, epitaph
+      FROM saints
+      WHERE epitaph IS NOT NULL
+      ORDER BY name;
+    `,
+  },
+  "hollow-filter": {
+    seedSql: `
+      CREATE TABLE acolytes (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        vow TEXT,
+        status TEXT NOT NULL,
+        active INTEGER NOT NULL
+      );
+      INSERT INTO acolytes (id, name, vow, status, active) VALUES
+        (1, 'Edda Rite', NULL, 'novice', 1),
+        (2, 'Finn Oath', 'silence', 'sworn', 1),
+        (3, 'Gwen Null', NULL, 'novice', 0),
+        (4, 'Hale Void', NULL, 'novice', 1);
+    `,
+    solutionSql: `
+      SELECT name, status
+      FROM acolytes
+      WHERE vow IS NULL AND active = 1
+      ORDER BY name;
+    `,
+  },
+  "blank-epitaph": {
+    seedSql: `
+      CREATE TABLE saints (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        epitaph TEXT
+      );
+      INSERT INTO saints (id, name, epitaph) VALUES
+        (1, 'Aldric Void', 'Keeper of the nave'),
+        (2, 'Beryl Null', NULL),
+        (3, 'Cyrus Hollow', 'Silent witness'),
+        (4, 'Dara Blank', NULL);
+    `,
+    solutionSql: `
+      SELECT name, COALESCE(epitaph, 'Unknown') AS epitaph
+      FROM saints
+      ORDER BY id;
+    `,
+  },
+  "orphan-pews": {
+    seedSql: `
+      CREATE TABLE pews (
+        id INTEGER PRIMARY KEY,
+        label TEXT NOT NULL
+      );
+      CREATE TABLE occupants (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        pew_id INTEGER NOT NULL
+      );
+      INSERT INTO pews (id, label) VALUES
+        (1, 'North A'),
+        (2, 'North B'),
+        (3, 'South A'),
+        (4, 'South B');
+      INSERT INTO occupants (id, name, pew_id) VALUES
+        (1, 'Iris Choir', 1),
+        (2, 'Jude Cantor', 3);
+    `,
+    solutionSql: `
+      SELECT pews.label
+      FROM pews
+      LEFT JOIN occupants ON occupants.pew_id = pews.id
+      WHERE occupants.name IS NULL
+      ORDER BY pews.label;
+    `,
+  },
+  "twin-psalms": {
+    seedSql: `
+      CREATE TABLE morning_psalms (
+        id INTEGER PRIMARY KEY,
+        verse TEXT NOT NULL
+      );
+      CREATE TABLE evening_psalms (
+        id INTEGER PRIMARY KEY,
+        verse TEXT NOT NULL
+      );
+      INSERT INTO morning_psalms (id, verse) VALUES
+        (1, 'Alpha'),
+        (2, 'Beta'),
+        (3, 'Gamma');
+      INSERT INTO evening_psalms (id, verse) VALUES
+        (1, 'Beta'),
+        (2, 'Delta'),
+        (3, 'Gamma');
+    `,
+    solutionSql: `
+      SELECT verse FROM morning_psalms
+      UNION ALL
+      SELECT verse FROM evening_psalms
+      ORDER BY verse;
+    `,
+  },
+  "rite-label": {
+    seedSql: `
+      CREATE TABLE acolytes (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        vow TEXT
+      );
+      INSERT INTO acolytes (id, name, vow) VALUES
+        (1, 'Edda Rite', NULL),
+        (2, 'Finn Oath', 'silence'),
+        (3, 'Gwen Null', 'service'),
+        (4, 'Hale Void', NULL);
+    `,
+    solutionSql: `
+      SELECT name, vow,
+        CASE
+          WHEN vow IS NULL THEN 'unsworn'
+          WHEN vow = 'silence' THEN 'vow-silence'
+          ELSE 'sworn'
+        END AS rite
+      FROM acolytes
+      ORDER BY name;
+    `,
+  },
+  "excommunicate": {
+    seedSql: `
+      CREATE TABLE clergy (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        rank TEXT NOT NULL
+      );
+      CREATE TABLE excommunicated (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        struck_on TEXT NOT NULL
+      );
+      INSERT INTO clergy (id, name, rank) VALUES
+        (1, 'Kira Canon', 'priest'),
+        (2, 'Liam Deacon', 'deacon'),
+        (3, 'Mara Clerk', 'clerk'),
+        (4, 'Noah Cantor', 'cantor');
+      INSERT INTO excommunicated (id, name, struck_on) VALUES
+        (2, 'Liam Deacon', '1024-06-01');
+    `,
+    solutionSql: `
+      SELECT name
+      FROM clergy
+      WHERE id NOT IN (SELECT id FROM excommunicated)
+      ORDER BY name;
+    `,
+  },
+  "absent-mass": {
+    seedSql: `
+      CREATE TABLE clergy (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        rank TEXT NOT NULL
+      );
+      CREATE TABLE attendance (
+        id INTEGER PRIMARY KEY,
+        clergy_id INTEGER NOT NULL,
+        mass_on TEXT NOT NULL
+      );
+      INSERT INTO clergy (id, name, rank) VALUES
+        (1, 'Kira Canon', 'priest'),
+        (2, 'Liam Deacon', 'deacon'),
+        (3, 'Mara Clerk', 'clerk'),
+        (4, 'Noah Cantor', 'cantor');
+      INSERT INTO attendance (id, clergy_id, mass_on) VALUES
+        (1, 1, '1024-07-01'),
+        (2, 3, '1024-07-01'),
+        (3, 1, '1024-07-08');
+    `,
+    solutionSql: `
+      SELECT name
+      FROM clergy
+      WHERE NOT EXISTS (
+        SELECT 1 FROM attendance WHERE attendance.clergy_id = clergy.id
+      )
+      ORDER BY name;
+    `,
+  },
+  "tithe-null": {
+    seedSql: `
+      CREATE TABLE offerings (
+        id INTEGER PRIMARY KEY,
+        parish TEXT NOT NULL,
+        tithe INTEGER
+      );
+      INSERT INTO offerings (id, parish, tithe) VALUES
+        (1, 'East', 10),
+        (2, 'East', NULL),
+        (3, 'West', 5),
+        (4, 'West', 15),
+        (5, 'North', NULL);
+    `,
+    solutionSql: `
+      SELECT parish, SUM(COALESCE(tithe, 0)) AS total_tithe
+      FROM offerings
+      GROUP BY parish
+      ORDER BY parish;
+    `,
+  },
+  "hollow-join": {
+    seedSql: `
+      CREATE TABLE saints (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        chapel_id INTEGER
+      );
+      CREATE TABLE chapels (
+        id INTEGER PRIMARY KEY,
+        chapel TEXT NOT NULL
+      );
+      INSERT INTO saints (id, name, chapel_id) VALUES
+        (1, 'Aldric Void', 1),
+        (2, 'Beryl Null', NULL),
+        (3, 'Cyrus Hollow', 2),
+        (4, 'Dara Blank', NULL);
+      INSERT INTO chapels (id, chapel) VALUES
+        (1, 'North Transept'),
+        (2, 'South Transept');
+    `,
+    solutionSql: `
+      SELECT saints.name,
+        COALESCE(chapels.chapel, 'Unassigned') AS chapel
+      FROM saints
+      LEFT JOIN chapels ON chapels.id = saints.chapel_id
+      ORDER BY saints.name;
+    `,
+  },
+  "rank-the-hollow": {
+    seedSql: `
+      CREATE TABLE devotees (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        devotion INTEGER
+      );
+      INSERT INTO devotees (id, name, devotion) VALUES
+        (1, 'Opal Faith', 80),
+        (2, 'Pax Hollow', NULL),
+        (3, 'Quinn Rite', 50),
+        (4, 'Rae Null', 70);
+    `,
+    solutionSql: `
+      SELECT name, ROW_NUMBER() OVER (ORDER BY COALESCE(devotion, 0) DESC) AS standing
+      FROM devotees
+      ORDER BY standing;
+    `,
+  },
+  "integrity-rite": {
+    seedSql: `
+      CREATE TABLE relics (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        shrine_id INTEGER
+      );
+      CREATE TABLE shrines (
+        id INTEGER PRIMARY KEY,
+        wing TEXT NOT NULL
+      );
+      INSERT INTO relics (id, name, shrine_id) VALUES
+        (1, 'Bone Chalice', 1),
+        (2, 'Void Candle', NULL),
+        (3, 'Ash Relic', 2),
+        (4, 'Hollow Icon', 3);
+      INSERT INTO shrines (id, wing) VALUES
+        (1, 'East'),
+        (2, 'West'),
+        (3, 'North');
+    `,
+    solutionSql: `
+      SELECT relics.name, shrines.wing
+      FROM relics
+      INNER JOIN shrines ON shrines.id = relics.shrine_id
+      WHERE relics.shrine_id IS NOT NULL
+        AND shrines.wing IN ('East', 'West')
+      ORDER BY relics.name;
+    `,
+  },
+  "cardinal-prelude": {
+    seedSql: `
+      CREATE TABLE clergy (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        title TEXT,
+        rank_code TEXT NOT NULL,
+        ordination TEXT
+      );
+      INSERT INTO clergy (id, name, title, rank_code, ordination) VALUES
+        (1, 'Sela Canon', 'Archdeacon', 'A', '1020-01-01'),
+        (2, 'Tarn Void', NULL, 'B', '1021-03-15'),
+        (3, 'Uma Null', 'Priest', 'C', NULL),
+        (4, 'Vex Hollow', NULL, 'A', '1019-11-20'),
+        (5, 'Wren Blank', 'Deacon', 'B', NULL);
+    `,
+    solutionSql: `
+      SELECT name, COALESCE(title, 'Cleric') AS title
+      FROM clergy
+      WHERE ordination IS NOT NULL
+        AND rank_code IN ('A', 'B')
+      ORDER BY name;
+    `,
+  },
+  "null-cardinal": {
+    seedSql: `
+      CREATE TABLE chapels (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        sealed INTEGER NOT NULL
+      );
+      CREATE TABLE clergy (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        ordination TEXT,
+        chapel_id INTEGER NOT NULL,
+        tithe INTEGER
+      );
+      CREATE TABLE attendance (
+        id INTEGER PRIMARY KEY,
+        clergy_id INTEGER NOT NULL,
+        mass_on TEXT NOT NULL
+      );
+      INSERT INTO chapels (id, name, sealed) VALUES
+        (1, 'North Transept', 0),
+        (2, 'South Transept', 0),
+        (3, 'Sealed Crypt', 1);
+      INSERT INTO clergy (id, name, ordination, chapel_id, tithe) VALUES
+        (1, 'Sela Canon', '1020-01-01', 1, 100),
+        (2, 'Tarn Void', '1021-03-15', 1, NULL),
+        (3, 'Uma Null', NULL, 2, 80),
+        (4, 'Vex Hollow', '1019-11-20', 2, 120),
+        (5, 'Wren Sealed', '1018-05-01', 3, 200);
+      INSERT INTO attendance (id, clergy_id, mass_on) VALUES
+        (1, 1, '1024-07-01'),
+        (2, 2, '1024-07-01'),
+        (3, 4, '1024-07-08'),
+        (4, 5, '1024-07-01');
+    `,
+    solutionSql: `
+      SELECT clergy.name, chapels.name AS chapel,
+        RANK() OVER (ORDER BY COALESCE(clergy.tithe, 0) DESC) AS standing
+      FROM clergy
+      INNER JOIN chapels ON chapels.id = clergy.chapel_id
+      WHERE clergy.ordination IS NOT NULL
+        AND chapels.sealed = 0
+        AND EXISTS (
+          SELECT 1 FROM attendance WHERE attendance.clergy_id = clergy.id
+        )
+      ORDER BY standing;
+    `,
+  },
+  "warp-thread": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        skill TEXT NOT NULL,
+        active INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name, skill, active) VALUES
+        (1, 'Aria Loom', 'warp', 1),
+        (2, 'Bryn Thread', 'weft', 1),
+        (3, 'Cora Idle', 'warp', 0),
+        (4, 'Dax Spool', 'weft', 0);
+    `,
+    solutionSql: `
+      WITH active AS (
+        SELECT name, skill FROM weavers WHERE active = 1
+      )
+      SELECT name, skill FROM active ORDER BY name;
+    `,
+  },
+  "weft-count": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name) VALUES
+        (1, 'Aria Loom'),
+        (2, 'Bryn Thread'),
+        (3, 'Cora Spool');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 40),
+        (2, 1, 50),
+        (3, 2, 30),
+        (4, 2, 60),
+        (5, 2, 70),
+        (6, 3, 10);
+    `,
+    solutionSql: `
+      SELECT weavers.name,
+        (SELECT COUNT(*) FROM threads WHERE threads.weaver_id = weavers.id) AS thread_count
+      FROM weavers
+      ORDER BY weavers.name;
+    `,
+  },
+  "anchor-thread": {
+    seedSql: `
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        tension INTEGER NOT NULL,
+        wing TEXT NOT NULL
+      );
+      INSERT INTO threads (id, name, tension, wing) VALUES
+        (1, 'Red Warp', 55, 'North'),
+        (2, 'Blue Weft', 35, 'North'),
+        (3, 'Gold Spool', 60, 'South'),
+        (4, 'Ash Thread', 45, 'North');
+    `,
+    solutionSql: `
+      WITH north AS (
+        SELECT id, name, tension FROM threads WHERE wing = 'North'
+      )
+      SELECT name, tension FROM north WHERE tension >= 40 ORDER BY id;
+    `,
+  },
+  "double-weave": {
+    seedSql: `
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        tension INTEGER NOT NULL,
+        wing TEXT NOT NULL
+      );
+      INSERT INTO threads (id, name, tension, wing) VALUES
+        (1, 'Red Warp', 55, 'North'),
+        (2, 'Blue Weft', 30, 'North'),
+        (3, 'Gold Spool', 70, 'East'),
+        (4, 'Silver Coil', 50, 'West');
+    `,
+    solutionSql: `
+      WITH strong AS (
+        SELECT name, tension FROM threads WHERE tension >= 50
+      ),
+      graded AS (
+        SELECT name, tension,
+          CASE
+            WHEN tension >= 60 THEN 'A'
+            ELSE 'B'
+          END AS grade
+        FROM strong
+      )
+      SELECT name, tension, grade FROM graded ORDER BY name;
+    `,
+  },
+  "gallery-join": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name) VALUES
+        (1, 'Aria Loom'),
+        (2, 'Bryn Thread'),
+        (3, 'Cora Spool');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 25),
+        (2, 1, 45),
+        (3, 2, 20),
+        (4, 3, 55);
+    `,
+    solutionSql: `
+      WITH hot AS (
+        SELECT DISTINCT weaver_id FROM threads WHERE tension > 30
+      )
+      SELECT weavers.name
+      FROM weavers
+      INNER JOIN hot ON hot.weaver_id = weavers.id
+      ORDER BY weavers.id;
+    `,
+  },
+  "tangled-join": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        wing TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name, wing) VALUES
+        (1, 'Aria Loom', 'North'),
+        (2, 'Bryn Thread', 'South'),
+        (3, 'Cora Spool', 'North');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 40),
+        (2, 1, 50),
+        (3, 3, 35);
+    `,
+    solutionSql: `
+      WITH north AS (
+        SELECT id, name FROM weavers WHERE wing = 'North'
+      )
+      SELECT north.name, threads.tension
+      FROM north
+      INNER JOIN threads ON threads.weaver_id = north.id
+      ORDER BY north.name;
+    `,
+  },
+  "archive-totals": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name) VALUES
+        (1, 'Aria Loom'),
+        (2, 'Bryn Thread');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 40),
+        (2, 1, 50),
+        (3, 2, 30),
+        (4, 2, 20);
+    `,
+    solutionSql: `
+      WITH roll AS (
+        SELECT weaver_id, tension FROM threads
+      )
+      SELECT weavers.name, SUM(roll.tension) AS total_tension
+      FROM weavers
+      INNER JOIN roll ON roll.weaver_id = weavers.id
+      GROUP BY weavers.name
+      ORDER BY weavers.name;
+    `,
+  },
+  "corridor-whisper": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name) VALUES
+        (1, 'Aria Loom'),
+        (2, 'Bryn Thread'),
+        (3, 'Cora Spool'),
+        (4, 'Dax Coil');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 70),
+        (2, 2, 30),
+        (3, 3, 65),
+        (4, 4, 40);
+    `,
+    solutionSql: `
+      SELECT name
+      FROM weavers
+      WHERE EXISTS (
+        SELECT 1 FROM threads
+        WHERE threads.weaver_id = weavers.id AND threads.tension > 60
+      )
+      ORDER BY name;
+    `,
+  },
+  "pattern-threshold": {
+    seedSql: `
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 40),
+        (2, 1, 50),
+        (3, 1, 20),
+        (4, 2, 30),
+        (5, 2, 30),
+        (6, 3, 50),
+        (7, 3, 60);
+    `,
+    solutionSql: `
+      WITH sums AS (
+        SELECT weaver_id, SUM(tension) AS total
+        FROM threads
+        GROUP BY weaver_id
+        HAVING SUM(tension) > 100
+      )
+      SELECT weaver_id, total FROM sums ORDER BY weaver_id;
+    `,
+  },
+  "vault-derived": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name) VALUES
+        (1, 'Aria Loom'),
+        (2, 'Bryn Thread'),
+        (3, 'Cora Spool');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 40),
+        (2, 1, 60),
+        (3, 2, 30),
+        (4, 2, 50),
+        (5, 3, 20);
+    `,
+    solutionSql: `
+      SELECT weavers.name, stats.avg_tension
+      FROM (
+        SELECT weaver_id, AVG(tension) AS avg_tension
+        FROM threads
+        GROUP BY weaver_id
+      ) AS stats
+      INNER JOIN weavers ON weavers.id = stats.weaver_id
+      ORDER BY weavers.name;
+    `,
+  },
+  "mirror-weave": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      INSERT INTO weavers (id, name) VALUES
+        (1, 'Aria Loom'),
+        (2, 'Bryn Thread'),
+        (3, 'Cora Spool');
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 40),
+        (2, 1, 60),
+        (3, 2, 30);
+    `,
+    solutionSql: `
+      WITH loom AS (
+        SELECT id, name FROM weavers
+      )
+      SELECT loom.name, COALESCE(MAX(threads.tension), 0) AS max_tension
+      FROM loom
+      LEFT JOIN threads ON threads.weaver_id = loom.id
+      GROUP BY loom.name
+      ORDER BY loom.name;
+    `,
+  },
+  "fracture-standing": {
+    seedSql: `
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        tension INTEGER NOT NULL,
+        wing TEXT NOT NULL
+      );
+      INSERT INTO threads (id, name, tension, wing) VALUES
+        (1, 'Red Warp', 70, 'East'),
+        (2, 'Blue Weft', 50, 'East'),
+        (3, 'Gold Spool', 80, 'West');
+    `,
+    solutionSql: `
+      WITH east AS (
+        SELECT name, tension FROM threads WHERE wing = 'East'
+      )
+      SELECT name, ROW_NUMBER() OVER (ORDER BY tension DESC) AS standing
+      FROM east
+      ORDER BY standing;
+    `,
+  },
+  "weaver-prelude": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        title TEXT,
+        wing TEXT NOT NULL
+      );
+      INSERT INTO weavers (id, name, title, wing) VALUES
+        (1, 'Aria Loom', 'Master', 'North'),
+        (2, 'Bryn Thread', NULL, 'East'),
+        (3, 'Cora Spool', 'Journeyman', 'South'),
+        (4, 'Dax Coil', NULL, 'North');
+    `,
+    solutionSql: `
+      WITH picked AS (
+        SELECT name, title FROM weavers WHERE wing IN ('North', 'East')
+      )
+      SELECT name, COALESCE(title, 'Apprentice') AS title
+      FROM picked
+      ORDER BY name;
+    `,
+  },
+  "loom-weaver": {
+    seedSql: `
+      CREATE TABLE weavers (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        active INTEGER NOT NULL
+      );
+      CREATE TABLE threads (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        tension INTEGER NOT NULL
+      );
+      CREATE TABLE shifts (
+        id INTEGER PRIMARY KEY,
+        weaver_id INTEGER NOT NULL,
+        shift_on TEXT NOT NULL
+      );
+      INSERT INTO weavers (id, name, active) VALUES
+        (1, 'Aria Loom', 1),
+        (2, 'Bryn Thread', 1),
+        (3, 'Cora Spool', 0),
+        (4, 'Dax Coil', 1);
+      INSERT INTO threads (id, weaver_id, tension) VALUES
+        (1, 1, 50),
+        (2, 1, 40),
+        (3, 2, 70),
+        (4, 2, 60),
+        (5, 3, 100),
+        (6, 4, 30),
+        (7, 4, 20);
+      INSERT INTO shifts (id, weaver_id, shift_on) VALUES
+        (1, 1, '1024-08-01'),
+        (2, 2, '1024-08-01'),
+        (3, 3, '1024-08-02'),
+        (4, 4, '1024-08-03');
+    `,
+    solutionSql: `
+      WITH totals AS (
+        SELECT weaver_id, SUM(tension) AS total
+        FROM threads
+        GROUP BY weaver_id
+      )
+      SELECT weavers.name, totals.total,
+        RANK() OVER (ORDER BY totals.total DESC) AS standing
+      FROM weavers
+      INNER JOIN totals ON totals.weaver_id = weavers.id
+      WHERE weavers.active = 1
+        AND EXISTS (
+          SELECT 1 FROM shifts WHERE shifts.weaver_id = weavers.id
+        )
+      ORDER BY standing;
+    `,
+  },
 };
 
 export function getChamberSeed(slug: string): ChamberSeed | undefined {
